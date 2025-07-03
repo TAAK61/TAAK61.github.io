@@ -1,0 +1,724 @@
+    "tags": ["ai", "personalization", "adaptation"]
+  },
+  {
+    "id": "T024",
+    "title": "Analyse comportementale",
+    "description": "Intégrer l'analyse comportementale pour l'optimisation UX",
+    "category": "AI",
+    "priority": "Medium",
+    "status": "todo",
+    "assignee": "AI Developer",
+    "branch": "feature/behavioral-analysis",
+    "estimatedHours": 4,
+    "actualHours": 0,
+    "phase": 5,
+    "dependencies": ["T023"],
+    "acceptanceCriteria": [
+      "Analyse comportementale active",
+      "Optimisation UX automatique",
+      "Métriques d'engagement"
+    ],
+    "tags": ["ai", "analytics", "ux-optimization"]
+  },
+  {
+    "id": "T025",
+    "title": "Intégration Setmore",
+    "description": "Intégrer le système de prise de rendez-vous Setmore",
+    "category": "Booking",
+    "priority": "High",
+    "status": "todo",
+    "assignee": "AI Developer",
+    "branch": "feature/setmore-integration",
+    "estimatedHours": 2,
+    "actualHours": 0,
+    "phase": 6,
+    "dependencies": ["T006"],
+    "acceptanceCriteria": [
+      "Setmore intégré",
+      "Pré-remplissage automatique",
+      "Ouverture nouvelle fenêtre"
+    ],
+    "tags": ["booking", "setmore", "integration"]
+  },
+  {
+    "id": "T026",
+    "title": "Formulaire de collaboration",
+    "description": "Créer le formulaire de demande de collaboration",
+    "category": "Forms",
+    "priority": "High",
+    "status": "todo",
+    "assignee": "AI Developer",
+    "branch": "feature/collaboration-form",
+    "estimatedHours": 3,
+    "actualHours": 0,
+    "phase": 6,
+    "dependencies": ["T025"],
+    "acceptanceCriteria": [
+      "Formulaire collaboration créé",
+      "Validation côté client/serveur",
+      "Envoi par email"
+    ],
+    "tags": ["forms", "collaboration", "validation"]
+  },
+  {
+    "id": "T027",
+    "title": "Smart contracts pour accords",
+    "description": "Développer les smart contracts pour automatiser les accords",
+    "category": "Blockchain",
+    "priority": "Low",
+    "status": "todo",
+    "assignee": "AI Developer",
+    "branch": "feature/smart-contracts",
+    "estimatedHours": 5,
+    "actualHours": 0,
+    "phase": 6,
+    "dependencies": ["T026"],
+    "acceptanceCriteria": [
+      "Smart contracts déployés",
+      "Automatisation accords",
+      "Interface utilisateur"
+    ],
+    "tags": ["smart-contracts", "blockchain", "automation"]
+  },
+  {
+    "id": "T028",
+    "title": "Tests unitaires Jest",
+    "description": "Développer la suite de tests unitaires",
+    "category": "Testing",
+    "priority": "High",
+    "status": "todo",
+    "assignee": "AI Developer",
+    "branch": "feature/unit-tests",
+    "estimatedHours": 4,
+    "actualHours": 0,
+    "phase": 7,
+    "dependencies": ["T022"],
+    "acceptanceCriteria": [
+      "Tests unitaires créés",
+      "Coverage > 80%",
+      "Intégration CI/CD"
+    ],
+    "tags": ["testing", "jest", "unit-tests"]
+  },
+  {
+    "id": "T029",
+    "title": "Tests e2e Playwright",
+    "description": "Développer les tests end-to-end avec Playwright",
+    "category": "Testing",
+    "priority": "High",
+    "status": "todo",
+    "assignee": "AI Developer",
+    "branch": "feature/e2e-tests",
+    "estimatedHours": 3,
+    "actualHours": 0,
+    "phase": 7,
+    "dependencies": ["T028"],
+    "acceptanceCriteria": [
+      "Tests e2e créés",
+      "Scénarios utilisateur couverts",
+      "Intégration CI/CD"
+    ],
+    "tags": ["testing", "playwright", "e2e"]
+  },
+  {
+    "id": "T030",
+    "title": "Optimisation performance",
+    "description": "Optimiser les performances globales de l'application",
+    "category": "Performance",
+    "priority": "Critical",
+    "status": "todo",
+    "assignee": "AI Developer",
+    "branch": "feature/performance-optimization",
+    "estimatedHours": 5,
+    "actualHours": 0,
+    "phase": 7,
+    "dependencies": ["T029"],
+    "acceptanceCriteria": [
+      "Core Web Vitals optimisés",
+      "Lighthouse score > 90",
+      "Bundle size optimisé"
+    ],
+    "tags": ["performance", "optimization", "lighthouse"]
+  },
+  {
+    "id": "T031",
+    "title": "Accessibilité WCAG 2.1 AA",
+    "description": "Implémenter la conformité WCAG 2.1 AA",
+    "category": "Accessibility",
+    "priority": "Critical",
+    "status": "todo",
+    "assignee": "AI Developer",
+    "branch": "feature/accessibility",
+    "estimatedHours": 4,
+    "actualHours": 0,
+    "phase": 7,
+    "dependencies": ["T030"],
+    "acceptanceCriteria": [
+      "WCAG 2.1 AA respecté",
+      "Tests axe-core passés",
+      "Navigation clavier complète"
+    ],
+    "tags": ["accessibility", "wcag", "a11y"]
+  },
+  {
+    "id": "T032",
+    "title": "Audit Lighthouse",
+    "description": "Effectuer l'audit Lighthouse et corriger les problèmes",
+    "category": "Quality Assurance",
+    "priority": "High",
+    "status": "todo",
+    "assignee": "AI Developer",
+    "branch": "feature/lighthouse-audit",
+    "estimatedHours": 2,
+    "actualHours": 0,
+    "phase": 7,
+    "dependencies": ["T031"],
+    "acceptanceCriteria": [
+      "Audit Lighthouse effectué",
+      "Score > 90 dans toutes catégories",
+      "Problèmes corrigés"
+    ],
+    "tags": ["audit", "lighthouse", "quality"]
+  },
+  {
+    "id": "T033",
+    "title": "Configuration domaine",
+    "description": "Configurer le domaine kiametoure.me",
+    "category": "Deployment",
+    "priority": "High",
+    "status": "todo",
+    "assignee": "AI Developer",
+    "branch": "feature/domain-config",
+    "estimatedHours": 1,
+    "actualHours": 0,
+    "phase": 8,
+    "dependencies": ["T032"],
+    "acceptanceCriteria": [
+      "Domaine configuré",
+      "SSL/TLS actif",
+      "Redirections configurées"
+    ],
+    "tags": ["domain", "ssl", "configuration"]
+  },
+  {
+    "id": "T034",
+    "title": "Déploiement Vercel/Netlify",
+    "description": "Déployer l'application sur Vercel ou Netlify",
+    "category": "Deployment",
+    "priority": "Critical",
+    "status": "todo",
+    "assignee": "AI Developer",
+    "branch": "feature/production-deployment",
+    "estimatedHours": 2,
+    "actualHours": 0,
+    "phase": 8,
+    "dependencies": ["T033"],
+    "acceptanceCriteria": [
+      "Application déployée",
+      "Variables d'environnement configurées",
+      "Déploiement automatique actif"
+    ],
+    "tags": ["deployment", "vercel", "netlify"]
+  },
+  {
+    "id": "T035",
+    "title": "Monitoring et analytics",
+    "description": "Configurer le monitoring et les analytics",
+    "category": "Monitoring",
+    "priority": "Medium",
+    "status": "todo",
+    "assignee": "AI Developer",
+    "branch": "feature/monitoring",
+    "estimatedHours": 2,
+    "actualHours": 0,
+    "phase": 8,
+    "dependencies": ["T034"],
+    "acceptanceCriteria": [
+      "Google Analytics configuré",
+      "Monitoring d'erreurs actif",
+      "Métriques de performance"
+    ],
+    "tags": ["monitoring", "analytics", "metrics"]
+  },
+  {
+    "id": "T036",
+    "title": "Release v1.0.0",
+    "description": "Finaliser et publier la version 1.0.0",
+    "category": "Release",
+    "priority": "Critical",
+    "status": "todo",
+    "assignee": "AI Developer",
+    "branch": "release/v1.0.0",
+    "estimatedHours": 1,
+    "actualHours": 0,
+    "phase": 8,
+    "dependencies": ["T035"],
+    "acceptanceCriteria": [
+      "Version 1.0.0 taggée",
+      "Release notes générées",
+      "Documentation finalisée"
+    ],
+    "tags": ["release", "v1.0.0", "production"]
+  }
+]
+[
+  {
+    "id": "T001",
+    "title": "Configuration initiale du projet",
+    "description": "Initialiser le repository avec la structure de base et les outils de développement",
+    "category": "Foundation",
+    "priority": "Critical",
+    "status": "todo",
+    "assignee": "AI Developer",
+    "branch": "feature/init-project",
+    "estimatedHours": 3,
+    "actualHours": 0,
+    "phase": 1,
+    "dependencies": [],
+    "acceptanceCriteria": [
+      "Repository GitHub créé et configuré",
+      "Structure de dossiers établie",
+      "Fichiers de configuration de base créés"
+    ],
+    "tags": ["setup", "configuration", "repository"]
+  },
+  {
+    "id": "T002",
+    "title": "Setup Next.js 15 + TypeScript strict",
+    "description": "Configurer Next.js 15 avec App Router et TypeScript en mode strict",
+    "category": "Foundation",
+    "priority": "Critical",
+    "status": "todo",
+    "assignee": "AI Developer",
+    "branch": "feature/nextjs-setup",
+    "estimatedHours": 2,
+    "actualHours": 0,
+    "phase": 1,
+    "dependencies": ["T001"],
+    "acceptanceCriteria": [
+      "Next.js 15 installé et configuré",
+      "TypeScript strict mode activé",
+      "App Router configuré",
+      "Premier build réussi"
+    ],
+    "tags": ["nextjs", "typescript", "app-router"]
+  },
+  {
+    "id": "T003",
+    "title": "Configuration Tailwind CSS",
+    "description": "Installer et configurer Tailwind CSS avec les personnalisations Liquid Glass",
+    "category": "Foundation",
+    "priority": "High",
+    "status": "todo",
+    "assignee": "AI Developer",
+    "branch": "feature/tailwind-config",
+    "estimatedHours": 1,
+    "actualHours": 0,
+    "phase": 1,
+    "dependencies": ["T002"],
+    "acceptanceCriteria": [
+      "Tailwind CSS installé et configuré",
+      "Palette de couleurs Liquid Glass définie",
+      "Utilitaires personnalisés créés"
+    ],
+    "tags": ["tailwind", "css", "styling"]
+  },
+  {
+    "id": "T004",
+    "title": "Setup ESLint + Prettier",
+    "description": "Configurer les outils de qualité de code et formatage",
+    "category": "Foundation",
+    "priority": "High",
+    "status": "todo",
+    "assignee": "AI Developer",
+    "branch": "feature/code-quality",
+    "estimatedHours": 1,
+    "actualHours": 0,
+    "phase": 1,
+    "dependencies": ["T002"],
+    "acceptanceCriteria": [
+      "ESLint configuré avec règles Next.js",
+      "Prettier configuré avec conventions projet",
+      "Scripts de linting fonctionnels"
+    ],
+    "tags": ["eslint", "prettier", "code-quality"]
+  },
+  {
+    "id": "T005",
+    "title": "Configuration CI/CD GitHub Actions",
+    "description": "Mettre en place les workflows d'intégration continue",
+    "category": "Foundation",
+    "priority": "High",
+    "status": "todo",
+    "assignee": "AI Developer",
+    "branch": "feature/github-actions",
+    "estimatedHours": 2,
+    "actualHours": 0,
+    "phase": 1,
+    "dependencies": ["T004"],
+    "acceptanceCriteria": [
+      "Workflow CI configuré",
+      "Tests automatisés sur PR",
+      "Déploiement automatique sur main"
+    ],
+    "tags": ["ci-cd", "github-actions", "automation"]
+  },
+  {
+    "id": "T006",
+    "title": "Composant GlassContainer base",
+    "description": "Créer le composant de base pour les effets Liquid Glass",
+    "category": "UI Components",
+    "priority": "Critical",
+    "status": "todo",
+    "assignee": "AI Developer",
+    "branch": "feature/glass-container",
+    "estimatedHours": 4,
+    "actualHours": 0,
+    "phase": 1,
+    "dependencies": ["T003"],
+    "acceptanceCriteria": [
+      "Composant GlassContainer créé",
+      "Effets blur et transparence fonctionnels",
+      "Fallback pour navigateurs non supportés"
+    ],
+    "tags": ["liquid-glass", "components", "ui"]
+  },
+  {
+    "id": "T007",
+    "title": "Section Hero avec Three.js",
+    "description": "Développer la section Hero avec intégration Three.js",
+    "category": "Sections",
+    "priority": "Critical",
+    "status": "todo",
+    "assignee": "AI Developer",
+    "branch": "feature/hero-section",
+    "estimatedHours": 5,
+    "actualHours": 0,
+    "phase": 2,
+    "dependencies": ["T006"],
+    "acceptanceCriteria": [
+      "Section Hero fullscreen créée",
+      "Three.js intégré et fonctionnel",
+      "Performance 60fps maintenue"
+    ],
+    "tags": ["hero", "threejs", "3d"]
+  },
+  {
+    "id": "T008",
+    "title": "Objets 3D flottants",
+    "description": "Créer les objets 3D flottants représentant les compétences",
+    "category": "3D Graphics",
+    "priority": "High",
+    "status": "todo",
+    "assignee": "AI Developer",
+    "branch": "feature/floating-objects",
+    "estimatedHours": 3,
+    "actualHours": 0,
+    "phase": 2,
+    "dependencies": ["T007"],
+    "acceptanceCriteria": [
+      "Objets 3D modélisés et intégrés",
+      "Animations fluides implémentées",
+      "Interactivité au survol"
+    ],
+    "tags": ["3d", "objects", "animations"]
+  },
+  {
+    "id": "T009",
+    "title": "Navigation dots Liquid Glass",
+    "description": "Créer la navigation par points avec effets Liquid Glass",
+    "category": "Navigation",
+    "priority": "High",
+    "status": "todo",
+    "assignee": "AI Developer",
+    "branch": "feature/nav-dots",
+    "estimatedHours": 3,
+    "actualHours": 0,
+    "phase": 2,
+    "dependencies": ["T006"],
+    "acceptanceCriteria": [
+      "Navigation dots créée",
+      "Transitions fluides entre sections",
+      "Accessibilité clavier respectée"
+    ],
+    "tags": ["navigation", "liquid-glass", "accessibility"]
+  },
+  {
+    "id": "T010",
+    "title": "Animations de transition",
+    "description": "Implémenter les animations de transition entre sections",
+    "category": "Animations",
+    "priority": "Medium",
+    "status": "todo",
+    "assignee": "AI Developer",
+    "branch": "feature/transitions",
+    "estimatedHours": 2,
+    "actualHours": 0,
+    "phase": 2,
+    "dependencies": ["T009"],
+    "acceptanceCriteria": [
+      "Transitions fluides implémentées",
+      "Durée optimisée (<500ms)",
+      "Respect des préférences utilisateur"
+    ],
+    "tags": ["animations", "transitions", "performance"]
+  },
+  {
+    "id": "T011",
+    "title": "Section Expertise - 4 cards",
+    "description": "Créer la section Expertise avec 4 cartes de compétences",
+    "category": "Sections",
+    "priority": "High",
+    "status": "todo",
+    "assignee": "AI Developer",
+    "branch": "feature/expertise-section",
+    "estimatedHours": 4,
+    "actualHours": 0,
+    "phase": 2,
+    "dependencies": ["T006"],
+    "acceptanceCriteria": [
+      "Section Expertise créée",
+      "4 cartes de compétences intégrées",
+      "Responsive design respecté"
+    ],
+    "tags": ["expertise", "cards", "responsive"]
+  },
+  {
+    "id": "T012",
+    "title": "Morphing hover effects",
+    "description": "Implémenter les effets de morphing au survol des cartes",
+    "category": "Interactions",
+    "priority": "Medium",
+    "status": "todo",
+    "assignee": "AI Developer",
+    "branch": "feature/morphing-effects",
+    "estimatedHours": 3,
+    "actualHours": 0,
+    "phase": 2,
+    "dependencies": ["T011"],
+    "acceptanceCriteria": [
+      "Effets de morphing fonctionnels",
+      "Performance maintenue",
+      "Accessibilité respectée"
+    ],
+    "tags": ["morphing", "hover", "interactions"]
+  },
+  {
+    "id": "T013",
+    "title": "Commandes vocales Web Speech API",
+    "description": "Intégrer la navigation par commandes vocales",
+    "category": "Advanced Features",
+    "priority": "Medium",
+    "status": "todo",
+    "assignee": "AI Developer",
+    "branch": "feature/voice-commands",
+    "estimatedHours": 4,
+    "actualHours": 0,
+    "phase": 2,
+    "dependencies": ["T009"],
+    "acceptanceCriteria": [
+      "Web Speech API intégré",
+      "Commandes vocales fonctionnelles",
+      "Interface utilisateur claire"
+    ],
+    "tags": ["voice", "speech-api", "accessibility"]
+  },
+  {
+    "id": "T014",
+    "title": "Galerie 3D portfolio",
+    "description": "Créer la galerie 3D immersive pour les projets",
+    "category": "Portfolio",
+    "priority": "Critical",
+    "status": "todo",
+    "assignee": "AI Developer",
+    "branch": "feature/portfolio-gallery",
+    "estimatedHours": 6,
+    "actualHours": 0,
+    "phase": 3,
+    "dependencies": ["T007"],
+    "acceptanceCriteria": [
+      "Galerie 3D créée",
+      "Navigation spatiale fonctionnelle",
+      "Lazy loading implémenté"
+    ],
+    "tags": ["portfolio", "3d", "gallery"]
+  },
+  {
+    "id": "T015",
+    "title": "Portails AR WebXR",
+    "description": "Implémenter les portails AR pour preview des projets",
+    "category": "AR/VR",
+    "priority": "High",
+    "status": "todo",
+    "assignee": "AI Developer",
+    "branch": "feature/ar-portals",
+    "estimatedHours": 5,
+    "actualHours": 0,
+    "phase": 3,
+    "dependencies": ["T014"],
+    "acceptanceCriteria": [
+      "WebXR API intégré",
+      "Portails AR fonctionnels",
+      "Fallback pour navigateurs non supportés"
+    ],
+    "tags": ["ar", "webxr", "portals"]
+  },
+  {
+    "id": "T016",
+    "title": "Système de particules",
+    "description": "Créer un système de particules interactives",
+    "category": "3D Graphics",
+    "priority": "Medium",
+    "status": "todo",
+    "assignee": "AI Developer",
+    "branch": "feature/particle-system",
+    "estimatedHours": 3,
+    "actualHours": 0,
+    "phase": 3,
+    "dependencies": ["T008"],
+    "acceptanceCriteria": [
+      "Système de particules créé",
+      "Interactions réactives",
+      "Performance optimisée"
+    ],
+    "tags": ["particles", "3d", "interactions"]
+  },
+  {
+    "id": "T017",
+    "title": "Lazy loading 3D assets",
+    "description": "Optimiser le chargement des assets 3D",
+    "category": "Performance",
+    "priority": "High",
+    "status": "todo",
+    "assignee": "AI Developer",
+    "branch": "feature/lazy-loading",
+    "estimatedHours": 2,
+    "actualHours": 0,
+    "phase": 3,
+    "dependencies": ["T014"],
+    "acceptanceCriteria": [
+      "Lazy loading implémenté",
+      "Temps de chargement optimisé",
+      "Indicateurs de progression"
+    ],
+    "tags": ["lazy-loading", "performance", "optimization"]
+  },
+  {
+    "id": "T018",
+    "title": "Widget prix crypto temps réel",
+    "description": "Créer le widget de suivi des prix crypto en temps réel",
+    "category": "Crypto",
+    "priority": "High",
+    "status": "todo",
+    "assignee": "AI Developer",
+    "branch": "feature/crypto-price-widget",
+    "estimatedHours": 4,
+    "actualHours": 0,
+    "phase": 4,
+    "dependencies": ["T006"],
+    "acceptanceCriteria": [
+      "Widget prix crypto créé",
+      "Mise à jour temps réel",
+      "Gestion des erreurs API"
+    ],
+    "tags": ["crypto", "real-time", "api"]
+  },
+  {
+    "id": "T019",
+    "title": "Galerie NFT dynamique",
+    "description": "Créer la galerie NFT avec showcase des collections",
+    "category": "Crypto",
+    "priority": "Medium",
+    "status": "todo",
+    "assignee": "AI Developer",
+    "branch": "feature/nft-gallery",
+    "estimatedHours": 4,
+    "actualHours": 0,
+    "phase": 4,
+    "dependencies": ["T018"],
+    "acceptanceCriteria": [
+      "Galerie NFT créée",
+      "Intégration blockchain",
+      "Showcase collections"
+    ],
+    "tags": ["nft", "blockchain", "gallery"]
+  },
+  {
+    "id": "T020",
+    "title": "Intégration DeFi tracking",
+    "description": "Intégrer le tracking des positions DeFi",
+    "category": "Crypto",
+    "priority": "Medium",
+    "status": "todo",
+    "assignee": "AI Developer",
+    "branch": "feature/defi-tracking",
+    "estimatedHours": 3,
+    "actualHours": 0,
+    "phase": 4,
+    "dependencies": ["T018"],
+    "acceptanceCriteria": [
+      "Tracking DeFi implémenté",
+      "Données portfolio temps réel",
+      "Sécurité renforcée"
+    ],
+    "tags": ["defi", "tracking", "portfolio"]
+  },
+  {
+    "id": "T021",
+    "title": "Effet cristal blockchain",
+    "description": "Créer l'effet visuel cristal pour les projets blockchain",
+    "category": "Visual Effects",
+    "priority": "Low",
+    "status": "todo",
+    "assignee": "AI Developer",
+    "branch": "feature/crystal-effect",
+    "estimatedHours": 2,
+    "actualHours": 0,
+    "phase": 4,
+    "dependencies": ["T019"],
+    "acceptanceCriteria": [
+      "Effet cristal créé",
+      "Rendu visuel optimisé",
+      "Intégration projets blockchain"
+    ],
+    "tags": ["crystal", "visual-effects", "blockchain"]
+  },
+  {
+    "id": "T022",
+    "title": "Chatbot portfolio intelligent",
+    "description": "Développer le chatbot IA pour l'exploration interactive",
+    "category": "AI",
+    "priority": "High",
+    "status": "todo",
+    "assignee": "AI Developer",
+    "branch": "feature/ai-chatbot",
+    "estimatedHours": 6,
+    "actualHours": 0,
+    "phase": 5,
+    "dependencies": ["T011"],
+    "acceptanceCriteria": [
+      "Chatbot IA intégré",
+      "Conversations naturelles",
+      "Contextualisation portfolio"
+    ],
+    "tags": ["ai", "chatbot", "conversation"]
+  },
+  {
+    "id": "T023",
+    "title": "Personnalisation temps réel",
+    "description": "Implémenter la personnalisation adaptative du contenu",
+    "category": "AI",
+    "priority": "Medium",
+    "status": "todo",
+    "assignee": "AI Developer",
+    "branch": "feature/ai-personalization",
+    "estimatedHours": 5,
+    "actualHours": 0,
+    "phase": 5,
+    "dependencies": ["T022"],
+    "acceptanceCriteria": [
+      "Personnalisation temps réel",
+      "Adaptation contenu visiteur",
+      "Respect de la confidentialité"
+    ],
+

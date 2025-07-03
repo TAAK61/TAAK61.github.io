@@ -1,0 +1,327 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Variables CSS pour Liquid Glass */
+:root {
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-shadow: rgba(0, 0, 0, 0.1);
+  --glass-blur: 12px;
+  --glass-highlight: rgba(255, 255, 255, 0.5);
+
+  --accent-blue: #007AFF;
+  --accent-orange: #FF9F00;
+  --accent-gold: #FFD700;
+  --accent-green: #32CD32;
+
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Reset et base styles */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+body {
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  font-variant-numeric: oldstyle-nums;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+  min-height: 100vh;
+}
+
+/* Support pour prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Liquid Glass Effects */
+.liquid-glass {
+  position: relative;
+  backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow:
+    0 8px 32px var(--glass-shadow),
+    inset 0 1px 0 var(--glass-highlight);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.liquid-glass::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.liquid-glass:hover::before {
+  left: 100%;
+}
+
+/* Distorsion liquide avancée */
+.liquid-distortion {
+  position: relative;
+  filter: url(#liquid-filter);
+}
+
+.liquid-distortion::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 255, 255, 0.1) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+  animation: liquid-wave 4s ease-in-out infinite;
+}
+
+/* Morphing interactif */
+.morphing-card {
+  transition: var(--transition-bounce);
+  border-radius: 2rem;
+}
+
+.morphing-card:hover {
+  border-radius: 0.5rem;
+  transform: translateY(-8px) scale(1.02);
+  box-shadow:
+    0 20px 80px rgba(0, 0, 0, 0.3),
+    0 0 40px rgba(255, 255, 255, 0.1);
+}
+
+/* Effet cristal pour crypto */
+.crystal-effect {
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 215, 0, 0.1) 0%,
+    rgba(50, 205, 50, 0.1) 50%,
+    rgba(0, 122, 255, 0.1) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20px) saturate(180%) hue-rotate(10deg);
+}
+
+.crystal-effect::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(45deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 70%
+  );
+  animation: crystal-shimmer 3s ease-in-out infinite;
+}
+
+/* Particules flottantes */
+.floating-particles {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: float-particle 8s linear infinite;
+}
+
+/* Navigation dots avec Liquid Glass */
+.nav-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(8px);
+  transition: var(--transition-smooth);
+  cursor: pointer;
+}
+
+.nav-dot.active {
+  width: 16px;
+  height: 16px;
+  background: rgba(255, 255, 255, 0.6);
+  box-shadow:
+    0 0 20px rgba(255, 255, 255, 0.5),
+    0 4px 16px rgba(0, 0, 0, 0.2);
+  transform: scale(1.2);
+}
+
+.nav-dot:hover {
+  background: rgba(255, 255, 255, 0.5);
+  transform: scale(1.1);
+}
+
+/* Animations personnalisées */
+@keyframes liquid-wave {
+  0%, 100% {
+    transform: rotate(0deg) scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: rotate(180deg) scale(1.2);
+    opacity: 0.8;
+  }
+}
+
+@keyframes crystal-shimmer {
+  0% {
+    transform: translateX(-100%) translateY(-100%) rotate(45deg);
+  }
+  100% {
+    transform: translateX(100%) translateY(100%) rotate(45deg);
+  }
+}
+
+@keyframes float-particle {
+  0% {
+    transform: translateY(100vh) translateX(0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100px) translateX(100px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes text-glow {
+  0%, 100% {
+    text-shadow:
+      0 0 10px rgba(255, 255, 255, 0.5),
+      0 0 20px rgba(0, 122, 255, 0.3),
+      0 0 30px rgba(0, 122, 255, 0.2);
+  }
+  50% {
+    text-shadow:
+      0 0 20px rgba(255, 255, 255, 0.8),
+      0 0 30px rgba(0, 122, 255, 0.5),
+      0 0 40px rgba(0, 122, 255, 0.3);
+  }
+}
+
+/* Styles pour les sections fullscreen */
+.section-fullscreen {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Gradient overlay pour profondeur */
+.gradient-overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 0%,
+    rgba(0, 0, 0, 0.4) 100%
+  );
+  pointer-events: none;
+}
+
+/* Support WebGL/Three.js */
+canvas {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* Scrollbar personnalisée */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Focus states pour l'accessibilité */
+.focus-ring {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 2px;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  @apply focus-ring;
+}
+
+/* Styles responsive pour mobile */
+@media (max-width: 768px) {
+  .liquid-glass {
+    backdrop-filter: blur(8px);
+    border-radius: 12px;
+  }
+
+  .morphing-card:hover {
+    transform: translateY(-4px) scale(1.01);
+  }
+
+  .section-fullscreen {
+    padding: 1rem;
+  }
+}
+
+/* Styles pour le mode sombre/clair */
+@media (prefers-color-scheme: light) {
+  :root {
+    --glass-bg: rgba(0, 0, 0, 0.1);
+    --glass-border: rgba(0, 0, 0, 0.2);
+    --glass-shadow: rgba(255, 255, 255, 0.1);
+    --glass-highlight: rgba(0, 0, 0, 0.5);
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .liquid-glass {
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    background: rgba(0, 0, 0, 0.9);
+  }
+}
