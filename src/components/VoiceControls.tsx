@@ -118,7 +118,7 @@ export function VoiceControls() {
         setRecognition(speechRecognition);
       }
     }
-  }, [processCommand]);
+  }, [processCommand, commands]);
 
   const startListening = () => {
     if (recognition && !isListening) {
