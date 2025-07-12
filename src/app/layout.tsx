@@ -1,6 +1,9 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
+import { ClientVoiceControls } from '@/components/ClientVoiceControls';
+import { PerformanceProvider, PerformanceIndicator } from '@/components/PerformanceManager';
+import { PerformanceTestSuite } from '@/components/PerformanceTestSuite';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -31,11 +34,6 @@ export const metadata: Metadata = {
     description: 'Concepteur de solutions IT & Digital avec technologie révolutionnaire',
     images: ['/og-image.jpg'],
   },
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 5,
-  },
   robots: {
     index: true,
     follow: true,
@@ -58,7 +56,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="fr" className="scroll-smooth">
+    <html lang="fr" className="scroll-smooth" suppressHydrationWarning={true}>
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -66,15 +64,50 @@ export default function RootLayout({
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#000000" />
         <meta name="color-scheme" content="dark light" />
+        {/* Suppression des erreurs extensions de navigateur */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              // Suppression des erreurs d'extensions
+              window.addEventListener('error', function(e) {
+                if (e.message && (
+                  e.message.includes('MetaMask') ||
+                  e.message.includes('chrome.runtime') ||
+                  e.message.includes('inpage.js')
+                )) {
+                  e.preventDefault();
+                  return true;
+                }
+              });
+              
+              // Suppression des erreurs console
+              const originalError = console.error;
+              console.error = function(...args) {
+                const message = args.join(' ');
+                if (message.includes('MetaMask') || 
+                    message.includes('chrome.runtime') ||
+                    message.includes('Could not establish connection')) {
+                  return;
+                }
+                originalError.apply(console, args);
+              };
+            `
+          }}
+        />
       </head>
       <body
         className={`${inter.className} antialiased bg-black text-white overflow-x-hidden`}
         suppressHydrationWarning={true}
       >
-        <div id="root" className="relative min-h-screen">
-          {children}
-        </div>
-        <div id="modal-root" />
+        <PerformanceProvider>
+          <div id="root" className="relative min-h-screen">
+            {children}
+          </div>
+          <ClientVoiceControls />
+          <div id="modal-root" />
+          <PerformanceIndicator />
+          <PerformanceTestSuite />
+        </PerformanceProvider>
       </body>
     </html>
   );

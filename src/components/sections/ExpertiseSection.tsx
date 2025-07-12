@@ -2,131 +2,184 @@
 
 import { useState } from 'react';
 
-const expertiseAreas = [
-  {
-    id: 'development',
-    title: 'Développement',
-    subtitle: 'Web • Mobile • Desktop',
-    description: 'Création d\'applications modernes avec les dernières technologies',
-    skills: ['React/Next.js', 'TypeScript', 'Node.js', 'Python', 'Mobile Apps'],
-    icon: '⚡',
-    gradient: 'from-blue-500 to-purple-600'
-  },
-  {
-    id: 'emerging-tech',
-    title: 'Technologies émergentes',
-    subtitle: 'VR/AR • IA • Impression 3D',
-    description: 'Innovation avec les technologies de pointe pour créer l\'avenir',
-    skills: ['WebXR', 'Three.js', 'Machine Learning', 'Computer Vision', 'IoT'],
-    icon: '🚀',
-    gradient: 'from-purple-500 to-pink-600'
-  },
-  {
-    id: 'crypto-blockchain',
-    title: 'Finance/Crypto',
-    subtitle: 'DeFi • Blockchain • Trading',
-    description: 'Développement d\'applications décentralisées et solutions crypto',
-    skills: ['Smart Contracts', 'Web3.js', 'DeFi Protocols', 'NFTs', 'Trading Bots'],
-    icon: '₿',
-    gradient: 'from-orange-500 to-yellow-600'
-  },
-  {
-    id: 'entrepreneurship',
-    title: 'Entrepreneuriat',
-    subtitle: 'Business • Innovation • Stratégie',
-    description: 'Création et développement de projets innovants et startups',
-    skills: ['Business Plan', 'Innovation', 'Leadership', 'Fundraising', 'Strategy'],
-    icon: '💡',
-    gradient: 'from-green-500 to-blue-600'
-  }
+const expertiseData = [
+	{
+		id: 'development',
+		title: 'Développement',
+		subtitle: 'Web • Mobile • Desktop',
+		description:
+			'Création d\'applications modernes avec les dernières technologies',
+		technologies: ['React', 'Next.js', 'TypeScript', 'Node.js', 'Python', 'Rust'],
+		icon: '💻',
+		color: 'from-blue-500 to-cyan-500',
+		projects: 12,
+	},
+	{
+		id: 'emerging-tech',
+		title: 'Technologies Émergentes',
+		subtitle: 'VR/AR • IA • Impression 3D',
+		description:
+			'Innovation avec les technologies de pointe et intelligence artificielle',
+		technologies: ['Three.js', 'WebXR', 'TensorFlow', 'OpenAI', 'Blender', 'Unity'],
+		icon: '🚀',
+		color: 'from-purple-500 to-pink-500',
+		projects: 8,
+	},
+	{
+		id: 'crypto',
+		title: 'Finance & Crypto',
+		subtitle: 'DeFi • Blockchain • NFT',
+		description:
+			'Solutions blockchain et finance décentralisée innovantes',
+		technologies: ['Solidity', 'Web3.js', 'Ethereum', 'Polygon', 'IPFS', 'DeFi'],
+		icon: '₿',
+		color: 'from-yellow-500 to-orange-500',
+		projects: 6,
+	},
+	{
+		id: 'business',
+		title: 'Entrepreneuriat',
+		subtitle: 'Business • Innovation • Strategy',
+		description:
+			'Accompagnement stratégique et création d\'entreprises innovantes',
+		technologies: ['Strategy', 'MVP', 'Funding', 'Marketing', 'Growth', 'Leadership'],
+		icon: '📈',
+		color: 'from-green-500 to-emerald-500',
+		projects: 15,
+	},
 ];
 
 export function ExpertiseSection() {
-  const [hoveredCard, setHoveredCard] = useState<string | null>(null);
+	const [hoveredCard, setHoveredCard] = useState<string | null>(null);
 
-  return (
-    <section id="expertise" className="section-fullscreen bg-gradient-to-br from-gray-900 to-black">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-16">
-          <h2 className="text-title font-bold text-white mb-4">
-            Mon Expertise
-          </h2>
-          <p className="text-subtitle text-white/70 max-w-2xl mx-auto">
-            Quatre domaines d'expertise pour créer des solutions complètes et innovantes
-          </p>
-        </div>
+	return (
+		<section className="min-h-screen py-20 px-4 relative overflow-hidden">
+			{/* Arrière-plan cohérent */}
+			<div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-900"></div>
+			<div className="absolute inset-0 bg-[radial-gradient(circle_at_40%_60%,rgba(59,130,246,0.1),transparent_50%)]"></div>
+			<div className="absolute inset-0 bg-[radial-gradient(circle_at_60%_40%,rgba(147,51,234,0.1),transparent_50%)]"></div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {expertiseAreas.map((area) => (
-            <div
-              key={area.id}
-              className={`morphing-card liquid-glass p-8 cursor-pointer group ${
-                hoveredCard === area.id ? 'scale-105' : ''
-              }`}
-              onMouseEnter={() => setHoveredCard(area.id)}
-              onMouseLeave={() => setHoveredCard(null)}
-            >
-              {/* Icône et titre */}
-              <div className="flex items-center mb-6">
-                <div className="text-4xl mr-4">{area.icon}</div>
-                <div>
-                  <h3 className="text-xl font-bold text-white mb-1">
-                    {area.title}
-                  </h3>
-                  <p className="text-sm text-white/60">{area.subtitle}</p>
-                </div>
-              </div>
+			<div className="container-responsive relative z-10">
+				{/* Header de section unifié */}
+				<div className="text-center mb-16">
+					<div className="inline-flex items-center gap-3 mb-6">
+						<div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+							<span className="text-2xl">⚡</span>
+						</div>
+						<h2 className="text-title bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent font-bold">
+							Expertise
+						</h2>
+					</div>
 
-              {/* Description */}
-              <p className="text-white/80 mb-6 leading-relaxed">
-                {area.description}
-              </p>
+					<p className="text-subtitle text-white/80 max-w-3xl mx-auto leading-relaxed">
+						Des compétences diversifiées pour transformer vos projets en réalités technologiques innovantes,
+						de la conception au déploiement en passant par l'optimisation.
+					</p>
+				</div>
 
-              {/* Compétences */}
-              <div className="flex flex-wrap gap-2 mb-6">
-                {area.skills.map((skill, index) => (
-                  <span
-                    key={index}
-                    className="px-3 py-1 bg-white/10 backdrop-blur-sm rounded-full text-sm text-white/90 border border-white/20"
-                  >
-                    {skill}
-                  </span>
-                ))}
-              </div>
+				{/* Grille de cartes d'expertise - Alignement vertical corrigé */}
+				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-8 mb-16">
+					{expertiseData.map((expertise, index) => (
+						<div
+							key={expertise.id}
+							className={`liquid-glass p-6 h-full group cursor-pointer transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/10 transform hover:scale-[1.02] ${
+								hoveredCard === expertise.id ? 'bg-white/5' : ''
+							}`}
+							onMouseEnter={() => setHoveredCard(expertise.id)}
+							onMouseLeave={() => setHoveredCard(null)}
+							style={{
+								animationDelay: `${index * 100}ms`
+							}}
+						>
+							{/* Header de carte */}
+							<div className="flex items-start justify-between mb-4">
+								<div className={`w-14 h-14 rounded-xl bg-gradient-to-r ${expertise.color} flex items-center justify-center text-2xl shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+									{expertise.icon}
+								</div>
+								<div className="text-right">
+									<div className="text-sm text-white/60">Projets</div>
+									<div className="text-xl font-bold text-white">{expertise.projects}</div>
+								</div>
+							</div>
 
-              {/* Barre de progression stylisée */}
-              <div className="w-full h-1 bg-white/20 rounded-full overflow-hidden">
-                <div
-                  className={`h-full bg-gradient-to-r ${area.gradient} transition-all duration-1000 group-hover:w-full`}
-                  style={{ width: hoveredCard === area.id ? '100%' : '60%' }}
-                />
-              </div>
+							{/* Contenu */}
+							<div className="space-y-4">
+								<div>
+									<h3 className="text-xl font-bold text-white mb-1 group-hover:text-blue-300 transition-colors">
+										{expertise.title}
+									</h3>
+									<p className="text-sm text-blue-300/80 font-medium">
+										{expertise.subtitle}
+									</p>
+								</div>
 
-              {/* Effet de brillance au survol */}
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <div className={`absolute inset-0 bg-gradient-to-r ${area.gradient} opacity-5 rounded-2xl`} />
-              </div>
-            </div>
-          ))}
-        </div>
+								<p className="text-white/80 text-sm leading-relaxed">
+									{expertise.description}
+								</p>
 
-        {/* Bouton pour explorer davantage */}
-        <div className="text-center mt-12">
-          <button className="glass-button px-8 py-4 text-white font-medium group">
-            <span className="flex items-center">
-              Explorer mes projets
-              <svg
-                className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
-            </span>
-          </button>
-        </div>
-      </div>
-    </section>
-  );
+								{/* Technologies */}
+								<div className="space-y-2">
+									<div className="text-xs text-white/60 font-medium">Technologies clés :</div>
+									<div className="flex flex-wrap gap-1">
+										{expertise.technologies.slice(0, 4).map((tech, techIndex) => (
+											<span
+												key={techIndex}
+												className="text-xs px-2 py-1 bg-white/10 text-white/90 rounded hover:bg-white/20 transition-colors"
+											>
+												{tech}
+											</span>
+										))}
+										{expertise.technologies.length > 4 && (
+											<span className="text-xs px-2 py-1 bg-white/5 text-white/70 rounded">
+												+{expertise.technologies.length - 4}
+											</span>
+										)}
+									</div>
+								</div>
+							</div>
+
+							{/* Indicateur de progression */}
+							<div className="mt-6 pt-4 border-t border-white/10">
+								<div className="flex items-center justify-between text-xs text-white/60 mb-2">
+									<span>Maîtrise</span>
+									<span>{index === 0 ? '95%' : index === 1 ? '88%' : index === 2 ? '85%' : '92%'}</span>
+								</div>
+								<div className="w-full bg-white/10 rounded-full h-2">
+									<div
+										className={`h-2 rounded-full bg-gradient-to-r ${expertise.color} transition-all duration-1000 ease-out`}
+										style={{
+											width: hoveredCard === expertise.id ?
+												(index === 0 ? '95%' : index === 1 ? '88%' : index === 2 ? '85%' : '92%') :
+												'0%'
+										}}
+									></div>
+								</div>
+							</div>
+						</div>
+					))}
+				</div>
+
+				{/* Section de statistiques */}
+				<div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+					{[
+						{ number: '41+', label: 'Projets réalisés', icon: '🎯' },
+						{ number: '4', label: 'Domaines d\'expertise', icon: '🚀' },
+						{ number: '25+', label: 'Technologies maîtrisées', icon: '⚡' },
+						{ number: '100%', label: 'Satisfaction client', icon: '⭐' }
+					].map((stat, index) => (
+						<div key={index} className="liquid-glass p-4 text-center group hover:bg-white/5 transition-all duration-300">
+							<div className="text-2xl mb-2 group-hover:scale-110 transition-transform">{stat.icon}</div>
+							<div className="text-2xl font-bold text-white mb-1">{stat.number}</div>
+							<div className="text-sm text-white/70">{stat.label}</div>
+						</div>
+					))}
+				</div>
+			</div>
+
+			{/* Effets visuels d'arrière-plan */}
+			<div className="absolute top-1/3 left-16 w-2 h-2 bg-blue-400 rounded-full animate-pulse opacity-60"></div>
+			<div className="absolute bottom-1/3 right-24 w-3 h-3 bg-purple-400 rounded-full animate-pulse opacity-40 delay-1000"></div>
+			<div className="absolute top-2/3 left-1/4 w-1 h-1 bg-white rounded-full animate-pulse opacity-80 delay-500"></div>
+		</section>
+	);
 }

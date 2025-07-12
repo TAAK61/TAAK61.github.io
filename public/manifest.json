@@ -1,0 +1,27 @@
+{
+  "name": "TAAK61 Portfolio - Liquid Glass",
+  "short_name": "TAAK61 Portfolio",
+  "description": "Portfolio personnel avec technologie Liquid Glass et intégration 3D",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#007AFF",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "16x16 32x32",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "categories": ["portfolio", "technology", "development"],
+  "lang": "fr",
+  "scope": "/",
+  "prefer_related_applications": false
+}
+
