@@ -5,15 +5,26 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 export interface VoiceControlsProps {
   onNavigate?: (section: string) => void;
   onCommand?: (command: string) => void;
+  isHidden?: boolean;
+  onToggleVisibility?: () => void;
 }
 
-export default function VoiceControls({ onNavigate, onCommand }: VoiceControlsProps) {
+export default function VoiceControls({ onNavigate, onCommand, isHidden, onToggleVisibility }: VoiceControlsProps) {
   const [isListening, setIsListening] = useState(false);
   const [isMinimized, setIsMinimized] = useState(true);
   const [lastCommand, setLastCommand] = useState('');
   const [isSupported, setIsSupported] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  // Position initiale dans la section hero (en haut à gauche)
+  const [position, setPosition] = useState({ x: 24, y: window?.innerHeight ? window.innerHeight - 150 : 650 });
   const recognitionRef = useRef<any>(null);
+  const dragRef = useRef<{ startX: number; startY: number; offsetX: number; offsetY: number }>({
+    startX: 0,
+    startY: 0,
+    offsetX: 0,
+    offsetY: 0
+  });
 
   const handleVoiceCommand = useCallback((command: string) => {
     setLastCommand(command);
@@ -105,7 +116,46 @@ export default function VoiceControls({ onNavigate, onCommand }: VoiceControlsPr
     }
   };
 
-  if (!isMounted) {
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    const rect = (e.target as HTMLElement).getBoundingClientRect();
+    dragRef.current = {
+      startX: e.clientX,
+      startY: e.clientY,
+      offsetX: e.clientX - rect.left,
+      offsetY: e.clientY - rect.top
+    };
+  };
+
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    if (!isDragging) return;
+
+    const newX = e.clientX - dragRef.current.offsetX;
+    const newY = e.clientY - dragRef.current.offsetY;
+
+    // Permettre le déplacement libre sur tout l'écran
+    setPosition({
+      x: Math.max(0, Math.min(window.innerWidth - (isMinimized ? 200 : 320), newX)),
+      y: Math.max(0, Math.min(window.innerHeight - (isMinimized ? 60 : 200), newY))
+    });
+  }, [isDragging, isMinimized]);
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
+  useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, [isDragging, handleMouseMove, handleMouseUp]);
+
+  if (!isMounted || isHidden) {
     return null;
   }
 
@@ -114,8 +164,8 @@ export default function VoiceControls({ onNavigate, onCommand }: VoiceControlsPr
       <div
         style={{
           position: 'fixed',
-          bottom: '24px',
-          left: '24px',
+          top: `${position.y}px`,
+          left: `${position.x}px`,
           zIndex: 10000,
           backgroundColor: 'rgba(239, 68, 68, 0.1)',
           backdropFilter: 'blur(20px)',
@@ -128,7 +178,22 @@ export default function VoiceControls({ onNavigate, onCommand }: VoiceControlsPr
           fontWeight: '500'
         }}
       >
-        <p style={{ fontSize: '13px', margin: 0 }}>🎤 Non supporté</p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <p style={{ fontSize: '13px', margin: 0 }}>🎤 Non supporté</p>
+          <button
+            onClick={onToggleVisibility}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#ef4444',
+              cursor: 'pointer',
+              fontSize: '16px'
+            }}
+            title="Masquer"
+          >
+            ×
+          </button>
+        </div>
       </div>
     );
   }
@@ -137,15 +202,17 @@ export default function VoiceControls({ onNavigate, onCommand }: VoiceControlsPr
     <div
       style={{
         position: 'fixed',
-        bottom: '24px',
-        left: '24px',
+        top: `${position.y}px`,
+        left: `${position.x}px`,
         zIndex: 10000,
         width: isMinimized ? '200px' : '320px',
         height: isMinimized ? '60px' : 'auto',
-        transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+        transition: isDragging ? 'none' : 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
         transform: 'translateZ(0)',
-        willChange: 'transform, width, height'
+        willChange: 'transform, width, height',
+        cursor: isDragging ? 'grabbing' : 'grab'
       }}
+      onMouseDown={handleMouseDown}
     >
       <div style={{
         background: 'rgba(255, 255, 255, 0.08)',
@@ -162,10 +229,13 @@ export default function VoiceControls({ onNavigate, onCommand }: VoiceControlsPr
         overflow: 'hidden',
         position: 'relative'
       }}>
-        {/* Widget minimisé - comme dans l'image */}
+        {/* Widget minimisé */}
         {isMinimized ? (
           <div
-            onClick={() => setIsMinimized(false)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsMinimized(false);
+            }}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -239,60 +309,87 @@ export default function VoiceControls({ onNavigate, onCommand }: VoiceControlsPr
                 Commandes vocales
               </span>
             </div>
+
+            {/* Bouton masquer */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleVisibility?.();
+              }}
+              style={{
+                position: 'absolute',
+                top: '8px',
+                right: '8px',
+                background: 'rgba(255, 255, 255, 0.1)',
+                border: 'none',
+                borderRadius: '6px',
+                color: 'rgba(255, 255, 255, 0.7)',
+                cursor: 'pointer',
+                fontSize: '12px',
+                padding: '4px 6px'
+              }}
+              title="Masquer"
+            >
+              ×
+            </button>
           </div>
         ) : (
-          // Widget développé
+          // Widget développé avec options
           <div>
-            {/* Header avec bouton toggle */}
+            {/* Header avec contrôles */}
             <div style={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
               padding: '16px 20px',
-              background: isListening
-                ? 'linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(220, 38, 38, 0.15))'
-                : 'linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.15))',
-              borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
+              borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{
-                  width: '12px',
-                  height: '12px',
-                  borderRadius: '50%',
-                  background: isListening
-                    ? 'radial-gradient(circle, #ef4444 0%, #dc2626 70%, rgba(239, 68, 68, 0.3) 100%)'
-                    : 'radial-gradient(circle, #6b7280 0%, #4b5563 70%, rgba(107, 114, 128, 0.3) 100%)',
-                  boxShadow: isListening
-                    ? '0 0 20px rgba(239, 68, 68, 0.6)'
-                    : '0 0 8px rgba(107, 114, 128, 0.3)',
-                  animation: isListening ? 'pulse 1.5s ease-in-out infinite' : 'none'
-                }} />
-
-                <span style={{
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  color: 'rgba(255, 255, 255, 0.9)'
-                }}>
-                  🎤 Commandes Vocales
-                </span>
+              <h3 style={{
+                fontSize: '16px',
+                fontWeight: '600',
+                color: 'rgba(255, 255, 255, 0.9)',
+                margin: 0
+              }}>
+                Commandes Vocales
+              </h3>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsMinimized(true);
+                  }}
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.1)',
+                    border: 'none',
+                    borderRadius: '6px',
+                    color: 'rgba(255, 255, 255, 0.7)',
+                    cursor: 'pointer',
+                    fontSize: '12px',
+                    padding: '4px 8px'
+                  }}
+                  title="Réduire"
+                >
+                  −
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onToggleVisibility?.();
+                  }}
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.1)',
+                    border: 'none',
+                    borderRadius: '6px',
+                    color: 'rgba(255, 255, 255, 0.7)',
+                    cursor: 'pointer',
+                    fontSize: '12px',
+                    padding: '4px 8px'
+                  }}
+                  title="Masquer"
+                >
+                  ×
+                </button>
               </div>
-
-              <button
-                onClick={() => setIsMinimized(true)}
-                style={{
-                  padding: '8px',
-                  background: 'rgba(255, 255, 255, 0.1)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  borderRadius: '8px',
-                  color: 'rgba(255, 255, 255, 0.8)',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease'
-                }}
-              >
-                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
             </div>
 
             {/* Contenu développé */}
@@ -394,14 +491,6 @@ export default function VoiceControls({ onNavigate, onCommand }: VoiceControlsPr
           </div>
         )}
       </div>
-
-      {/* Animations CSS */}
-      <style>{`
-        @keyframes pulse {
-          0%, 100% { transform: scale(1); opacity: 1; }
-          50% { transform: scale(1.1); opacity: 0.8; }
-        }
-      `}</style>
     </div>
   );
 }

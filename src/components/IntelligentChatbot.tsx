@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Types pour le chatbot
@@ -17,15 +17,32 @@ interface AIResponse {
   suggestions?: string[];
 }
 
-export function IntelligentChatbot() {
+interface IntelligentChatbotProps {
+  isHidden?: boolean;
+  onToggleVisibility?: () => void;
+}
+
+export function IntelligentChatbot({ isHidden, onToggleVisibility }: IntelligentChatbotProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  // Position initiale dans la section hero (côté droit)
+  const [position, setPosition] = useState({
+    x: typeof window !== 'undefined' ? window.innerWidth - 88 : 300,
+    y: typeof window !== 'undefined' ? window.innerHeight - 150 : 650
+  });
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const dragRef = useRef<{ startX: number; startY: number; offsetX: number; offsetY: number }>({
+    startX: 0,
+    startY: 0,
+    offsetX: 0,
+    offsetY: 0
+  });
 
   // Base de connaissances sur Kiame Touré
   const knowledgeBase = {
@@ -167,20 +184,70 @@ export function IntelligentChatbot() {
     }
   };
 
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (isOpen) return; // Ne permettre le drag que quand fermé
+    setIsDragging(true);
+    const rect = (e.target as HTMLElement).getBoundingClientRect();
+    dragRef.current = {
+      startX: e.clientX,
+      startY: e.clientY,
+      offsetX: e.clientX - rect.left,
+      offsetY: e.clientY - rect.top
+    };
+  };
+
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    if (!isDragging) return;
+
+    const newX = e.clientX - dragRef.current.offsetX;
+    const newY = e.clientY - dragRef.current.offsetY;
+
+    // Permettre le déplacement libre sur tout l'écran
+    setPosition({
+      x: Math.max(0, Math.min(window.innerWidth - 64, newX)),
+      y: Math.max(0, Math.min(window.innerHeight - 64, newY))
+    });
+  }, [isDragging]);
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
+  useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, [isDragging, handleMouseMove, handleMouseUp]);
+
+  if (isHidden) {
+    return null;
+  }
+
   return (
     <>
-      {/* Bouton du chatbot */}
+      {/* Bouton flottant */}
       <motion.div
-        className="fixed bottom-6 left-6 z-[9999]"
-        initial={{ scale: 1, opacity: 1 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0 }} // Apparition immédiate
+        className={`fixed z-50`}
+        style={{
+          top: `${position.y}px`,
+          left: `${position.x}px`,
+          cursor: isDragging ? 'grabbing' : 'grab'
+        }}
+        onMouseDown={handleMouseDown}
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ type: "spring", stiffness: 260, damping: 20 }}
       >
         <motion.button
-          onClick={toggleChat}
+          onClick={!isDragging ? toggleChat : undefined}
           className="relative w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg shadow-purple-500/25 border-2 border-purple-400/30 backdrop-blur-xl"
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
+          whileHover={{ scale: isDragging ? 1 : 1.1 }}
+          whileTap={{ scale: isDragging ? 1 : 0.95 }}
           title="Assistant IA Portfolio"
         >
           <motion.div
@@ -201,6 +268,20 @@ export function IntelligentChatbot() {
             </motion.div>
           )}
 
+          {/* Bouton masquer (visible au survol) */}
+          <motion.button
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleVisibility?.();
+            }}
+            className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center text-white text-xs opacity-0 hover:opacity-100 transition-opacity"
+            title="Masquer le chatbot"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+          >
+            ×
+          </motion.button>
+
           {/* Animation de pulsation */}
           <motion.div
             className="absolute inset-0 rounded-full border-2 border-purple-400"
@@ -217,7 +298,11 @@ export function IntelligentChatbot() {
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed bottom-24 left-6 z-40 w-96 h-[500px] bg-black/90 backdrop-blur-xl rounded-2xl border border-white/20 flex flex-col shadow-2xl"
+            className="fixed z-40 w-96 h-[500px] bg-black/90 backdrop-blur-xl rounded-2xl border border-white/20 flex flex-col shadow-2xl"
+            style={{
+              top: `${Math.max(0, position.y - 520)}px`,
+              left: `${Math.max(0, Math.min(window.innerWidth - 384, position.x - 320))}px`
+            }}
           >
             {/* Header */}
             <div className="p-4 border-b border-white/10 flex items-center justify-between">
@@ -230,12 +315,25 @@ export function IntelligentChatbot() {
                   <p className="text-white/60 text-xs">Portfolio de Kiame</p>
                 </div>
               </div>
-              <button
-                onClick={toggleChat}
-                className="text-white/60 hover:text-white transition-colors"
-              >
-                ×
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onToggleVisibility?.();
+                  }}
+                  className="text-white/60 hover:text-red-400 transition-colors text-sm px-2 py-1 hover:bg-white/10 rounded"
+                  title="Masquer définitivement"
+                >
+                  🗑️
+                </button>
+                <button
+                  onClick={toggleChat}
+                  className="text-white/60 hover:text-white transition-colors text-lg"
+                  title="Fermer"
+                >
+                  ×
+                </button>
+              </div>
             </div>
 
             {/* Messages */}
