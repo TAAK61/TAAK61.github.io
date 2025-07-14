@@ -16,8 +16,11 @@ export default function VoiceControls({ onNavigate, onCommand, isHidden, onToggl
   const [isSupported, setIsSupported] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
-  // Position initiale dans la section hero (en haut à gauche)
-  const [position, setPosition] = useState({ x: 24, y: window?.innerHeight ? window.innerHeight - 150 : 650 });
+  // Position dans la zone de la section hero (hauteur d'écran moins marge)
+  const [position, setPosition] = useState({
+    x: 24,
+    y: typeof window !== 'undefined' ? window.innerHeight - 150 : 650
+  });
   const recognitionRef = useRef<any>(null);
   const dragRef = useRef<{ startX: number; startY: number; offsetX: number; offsetY: number }>({
     startX: 0,
@@ -204,13 +207,14 @@ export default function VoiceControls({ onNavigate, onCommand, isHidden, onToggl
         position: 'fixed',
         top: `${position.y}px`,
         left: `${position.x}px`,
-        zIndex: 10000,
+        zIndex: 2147483644, // Z-index maximum JavaScript - 3
         width: isMinimized ? '200px' : '320px',
         height: isMinimized ? '60px' : 'auto',
         transition: isDragging ? 'none' : 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
         transform: 'translateZ(0)',
         willChange: 'transform, width, height',
-        cursor: isDragging ? 'grabbing' : 'grab'
+        cursor: isDragging ? 'grabbing' : 'grab',
+        pointerEvents: 'auto' // Assurer l'interactivité
       }}
       onMouseDown={handleMouseDown}
     >

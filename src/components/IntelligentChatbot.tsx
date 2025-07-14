@@ -29,7 +29,7 @@ export function IntelligentChatbot({ isHidden, onToggleVisibility }: Intelligent
   const [isTyping, setIsTyping] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
-  // Position initiale dans la section hero (côté droit)
+  // Position dans la zone de la section hero (côté droit)
   const [position, setPosition] = useState({
     x: typeof window !== 'undefined' ? window.innerWidth - 88 : 300,
     y: typeof window !== 'undefined' ? window.innerHeight - 150 : 650
@@ -232,11 +232,13 @@ export function IntelligentChatbot({ isHidden, onToggleVisibility }: Intelligent
     <>
       {/* Bouton flottant */}
       <motion.div
-        className={`fixed z-50`}
         style={{
+          position: 'fixed',
           top: `${position.y}px`,
           left: `${position.x}px`,
-          cursor: isDragging ? 'grabbing' : 'grab'
+          zIndex: 2147483643, // Z-index maximum JavaScript - 4
+          cursor: isDragging ? 'grabbing' : 'grab',
+          pointerEvents: 'auto' // Assurer l'interactivité
         }}
         onMouseDown={handleMouseDown}
         initial={{ scale: 0 }}
@@ -268,26 +270,26 @@ export function IntelligentChatbot({ isHidden, onToggleVisibility }: Intelligent
             </motion.div>
           )}
 
-          {/* Bouton masquer (visible au survol) */}
-          <motion.button
-            onClick={(e) => {
-              e.stopPropagation();
-              onToggleVisibility?.();
-            }}
-            className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center text-white text-xs opacity-0 hover:opacity-100 transition-opacity"
-            title="Masquer le chatbot"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-          >
-            ×
-          </motion.button>
-
           {/* Animation de pulsation */}
           <motion.div
             className="absolute inset-0 rounded-full border-2 border-purple-400"
             animate={{ scale: [1, 1.2], opacity: [1, 0] }}
             transition={{ duration: 2, repeat: Infinity }}
           />
+        </motion.button>
+
+        {/* Bouton masquer (en dehors du bouton principal) */}
+        <motion.button
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleVisibility?.();
+          }}
+          className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center text-white text-xs opacity-0 hover:opacity-100 transition-opacity"
+          title="Masquer le chatbot"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+        >
+          ×
         </motion.button>
       </motion.div>
 
@@ -298,11 +300,16 @@ export function IntelligentChatbot({ isHidden, onToggleVisibility }: Intelligent
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed z-40 w-96 h-[500px] bg-black/90 backdrop-blur-xl rounded-2xl border border-white/20 flex flex-col shadow-2xl"
             style={{
+              position: 'fixed',
               top: `${Math.max(0, position.y - 520)}px`,
-              left: `${Math.max(0, Math.min(window.innerWidth - 384, position.x - 320))}px`
+              left: `${Math.max(0, Math.min(window.innerWidth - 384, position.x - 320))}px`,
+              zIndex: 2147483642, // Z-index maximum JavaScript - 5
+              pointerEvents: 'auto', // Assurer l'interactivité
+              width: '24rem',
+              height: '500px'
             }}
+            className="bg-black/90 backdrop-blur-xl rounded-2xl border border-white/20 flex flex-col shadow-2xl"
           >
             {/* Header */}
             <div className="p-4 border-b border-white/10 flex items-center justify-between">

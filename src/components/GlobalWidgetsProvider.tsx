@@ -1,11 +1,9 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import VoiceControls from './VoiceControls';
 import { IntelligentChatbot } from './IntelligentChatbot';
-import { ModernNavigation } from './ModernNavigation';
-import { AdvancedVoiceControls } from './AdvancedVoiceControls';
-import { CryptoWidget } from './CryptoWidget';
 
 interface WidgetsState {
   voiceControls: {
@@ -44,6 +42,37 @@ export function GlobalWidgetsProvider({ children }: { children: ReactNode }) {
   const [widgets, setWidgets] = useState<WidgetsState>(defaultWidgetsState);
   const [showWidgetsMenu, setShowWidgetsMenu] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null);
+
+  // Créer un conteneur de portail au niveau le plus élevé
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      let container = document.getElementById('widgets-portal');
+      if (!container) {
+        container = document.createElement('div');
+        container.id = 'widgets-portal';
+        container.style.cssText = `
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          pointer-events: none;
+          z-index: 2147483647;
+        `;
+        document.body.appendChild(container);
+      }
+      setPortalContainer(container);
+      setIsMounted(true);
+    }
+
+    return () => {
+      const container = document.getElementById('widgets-portal');
+      if (container) {
+        container.remove();
+      }
+    };
+  }, []);
 
   // Charger l'état depuis localStorage
   useEffect(() => {
@@ -100,15 +129,13 @@ export function GlobalWidgetsProvider({ children }: { children: ReactNode }) {
     resetWidgets,
   };
 
-  if (!isMounted) {
+  if (!isMounted || !portalContainer) {
     return <>{children}</>;
   }
 
-  return (
-    <WidgetsContext.Provider value={contextValue}>
-      {children}
-
-      {/* Widgets flottants */}
+  const widgetsContent = (
+    <>
+      {/* Widgets flottants rendus dans le portail */}
       {widgets.voiceControls.isEnabled && (
         <VoiceControls
           isHidden={!widgets.voiceControls.isVisible}
@@ -126,7 +153,8 @@ export function GlobalWidgetsProvider({ children }: { children: ReactNode }) {
       {/* Menu de contrôle des widgets */}
       {showWidgetsMenu && (
         <div
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center"
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center"
+          style={{ zIndex: 2147483646, pointerEvents: 'auto' }}
           onClick={() => setShowWidgetsMenu(false)}
         >
           <div
@@ -217,8 +245,12 @@ export function GlobalWidgetsProvider({ children }: { children: ReactNode }) {
       {/* Bouton d'accès rapide aux préférences widgets */}
       <button
         onClick={() => setShowWidgetsMenu(true)}
-        className="fixed top-4 right-4 z-[9998] w-12 h-12 bg-black/60 backdrop-blur-xl border border-white/20 rounded-full flex items-center justify-center text-white hover:bg-black/80 transition-all group"
+        className="fixed top-4 right-4 w-12 h-12 bg-black/60 backdrop-blur-xl border border-white/20 rounded-full flex items-center justify-center text-white hover:bg-black/80 transition-all group"
         title="Préférences widgets"
+        style={{
+          zIndex: 2147483645,
+          pointerEvents: 'auto'
+        }}
       >
         <svg
           className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300"
@@ -240,6 +272,13 @@ export function GlobalWidgetsProvider({ children }: { children: ReactNode }) {
           />
         </svg>
       </button>
+    </>
+  );
+
+  return (
+    <WidgetsContext.Provider value={contextValue}>
+      {children}
+      {createPortal(widgetsContent, portalContainer)}
     </WidgetsContext.Provider>
   );
 }
