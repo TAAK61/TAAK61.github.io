@@ -18,9 +18,7 @@ export const PerformanceTestSuite = () => {
   const [testResults, setTestResults] = useState<string[]>([]);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isMinimized, setIsMinimized] = useState(true);
-  const [isVisible, setIsVisible] = useState(true); // Option pour fermer complètement
-  const [isDragging, setIsDragging] = useState(false);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isVisible, setIsVisible] = useState(true);
   const { settings, isLowEnd, isMobile } = usePerformance();
   const dragRef = useRef<HTMLDivElement>(null);
   const metricsRef = useRef<PerformanceMetrics>({
@@ -217,37 +215,13 @@ export const PerformanceTestSuite = () => {
     runAutoTests();
   }, []);
 
-  // Gestion du drag & drop
-  useEffect(() => {
-    if (!isDragging) return;
-
-    const handleMouseMove = (e: MouseEvent) => {
-      setPosition({
-        x: e.clientX - 200, // Offset pour centrer
-        y: e.clientY - 50
-      });
-    };
-
-    const handleMouseUp = () => {
-      setIsDragging(false);
-    };
-
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [isDragging]);
-
   // Si pas visible, ne rien afficher
   if (!isVisible) {
     return null;
   }
 
   return (
-    <div className="fixed top-6 right-6 z-[9998]">
+    <div className="fixed bottom-20 right-6 z-[10000]" style={{ zIndex: 10000 }}>
       {/* Bouton principal - toujours visible */}
       <div className="relative">
         <button
@@ -275,12 +249,13 @@ export const PerformanceTestSuite = () => {
         <>
           {/* Overlay pour fermer */}
           <div
-            className="fixed inset-0 z-[9997]"
+            className="fixed inset-0"
+            style={{ zIndex: 9999 }}
             onClick={() => setIsExpanded(false)}
           />
 
           {/* Panneau principal */}
-          <div className="absolute top-16 right-0 w-96 liquid-glass rounded-lg overflow-hidden shadow-2xl border border-white/20 z-[9998] animate-fade-in-scale backdrop-blur-lg">
+          <div className="absolute bottom-16 right-0 w-96 liquid-glass rounded-lg overflow-hidden shadow-2xl border border-white/20 backdrop-blur-lg" style={{ zIndex: 10001 }}>
             {/* Header avec contrôles */}
             <div className="flex items-center justify-between p-3 border-b border-white/10 bg-white/5">
               <h3 className="text-sm font-semibold text-white">🧪 Tests de Performance</h3>

@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import dynamic from 'next/dynamic';
 
-// Import dynamique de la galerie 3D pour éviter les erreurs SSR
-const Portfolio3DGallery = dynamic(() => import('../three/Portfolio3DGallery'), {
+// Import dynamique du composant Portfolio3DGallery pour éviter les erreurs SSR
+const Portfolio3DGallery = dynamic(() => import('../three/Portfolio3DGallery').then(mod => ({ default: mod.Portfolio3DGallery })), {
   ssr: false,
   loading: () => (
     <div className="relative w-full h-96 bg-gradient-to-br from-blue-900/20 to-purple-900/20 rounded-2xl animate-pulse flex items-center justify-center">
@@ -141,7 +141,7 @@ export function PortfolioSection() {
                     {project.description}
                   </p>
 
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-2 mb-4">
                     {project.technologies.slice(0, 3).map((tech, techIndex) => (
                       <span key={techIndex} className="text-xs px-2 py-1 bg-white/10 text-white/90 rounded">
                         {tech}
@@ -152,6 +152,16 @@ export function PortfolioSection() {
                         +{project.technologies.length - 3}
                       </span>
                     )}
+                  </div>
+
+                  {/* Boutons d'action pour la vue grille */}
+                  <div className="flex gap-2 mt-4">
+                    <button className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white text-sm rounded-lg hover:from-blue-600 hover:to-purple-600 transition-all">
+                      Voir le projet
+                    </button>
+                    <button className="flex-1 px-4 py-2 border border-white/20 text-white text-sm rounded-lg hover:bg-white/5 transition-all">
+                      Code source
+                    </button>
                   </div>
                 </div>
               ))}
@@ -180,6 +190,29 @@ export function PortfolioSection() {
       <div className="absolute top-1/4 left-10 w-2 h-2 bg-blue-400 rounded-full animate-pulse opacity-60"></div>
       <div className="absolute top-3/4 right-20 w-3 h-3 bg-purple-400 rounded-full animate-pulse opacity-40 delay-1000"></div>
       <div className="absolute bottom-1/4 left-1/3 w-1 h-1 bg-white rounded-full animate-pulse opacity-80 delay-500"></div>
+
+      {/* Instructions d'interaction pour la vue 3D */}
+      {viewMode === '3d' && (
+        <div className="mt-12 text-center">
+          <div className="liquid-glass p-6 max-w-2xl mx-auto">
+            <h3 className="text-white font-semibold mb-4">🎮 Comment interagir</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-white/80">
+              <div className="flex items-center gap-2">
+                <span>🖱️</span>
+                <span>Survolez pour agrandir</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span>👆</span>
+                <span>Cliquez pour les détails</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span>🎤</span>
+                <span>Utilisez les commandes vocales</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

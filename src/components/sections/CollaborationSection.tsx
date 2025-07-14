@@ -52,293 +52,284 @@ const collaborationTypes = [
 			'Développement sur mesure',
 			'Consulting technique',
 			'Formation équipes',
-			'Support maintenance',
+			'Maintenance support',
 		],
 		gradient: 'from-purple-500 to-pink-600',
+	},
+	{
+		id: 'humanitarian',
+		title: 'Projets humanitaires',
+		description: 'Missions gratuites pour causes sociales et environnementales',
+		icon: '🤝',
+		features: [
+			'Impact social positif',
+			'Technologies accessibles',
+			'Open source',
+			'Bénévolat qualifié',
+		],
+		gradient: 'from-red-500 to-orange-600',
 	},
 ];
 
 export function CollaborationSection() {
 	const [selectedType, setSelectedType] = useState<string | null>(null);
-	const [hoveredCard, setHoveredCard] = useState<string | null>(null);
+	const [formData, setFormData] = useState({
+		name: '',
+		email: '',
+		company: '',
+		type: '',
+		message: '',
+		budget: '',
+		timeline: '',
+	});
+
+	const handleSubmit = (e: React.FormEvent) => {
+		e.preventDefault();
+		// Logique de soumission du formulaire
+		console.log('Form submitted:', formData);
+	};
+
+	const handleSetmoreBooking = () => {
+		// Ouverture directe de ton lien Setmore personnel
+		window.open('https://kiame.setmore.com', '_blank', 'noopener,noreferrer');
+	};
 
 	return (
-		<section className="min-h-screen py-20 px-4 relative overflow-hidden">
-			{/* Arrière-plan cohérent */}
-			<div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-900"></div>
-			<div className="absolute inset-0 bg-[radial-gradient(circle_at_60%_40%,rgba(59,130,246,0.1),transparent_50%)]"></div>
-			<div className="absolute inset-0 bg-[radial-gradient(circle_at_40%_80%,rgba(147,51,234,0.1),transparent_50%)]"></div>
-
-			<div className="container-responsive relative z-10">
-				{/* Header de section unifié */}
-				<div className="text-center mb-16">
-					<div className="inline-flex items-center gap-3 mb-6">
-						<div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
-							<span className="text-2xl">🤝</span>
-						</div>
-						<h2 className="text-title bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent font-bold">
-							Collaboration
-						</h2>
-					</div>
-
-					<p className="text-subtitle text-white/80 max-w-3xl mx-auto leading-relaxed">
-						Travaillons ensemble pour donner vie à vos projets les plus ambitieux.
-						De l'idée au lancement, je vous accompagne à chaque étape de votre
-						transformation digitale.
+		<section
+			id="collaboration"
+			className="section-fullscreen bg-gradient-to-t from-black to-gray-900 relative"
+		>
+			<div className="max-w-7xl mx-auto px-6 py-12">
+				<div className="text-center mb-12">
+					<h2 className="text-title font-bold text-white mb-4">
+						Collaboration
+					</h2>
+					<p className="text-subtitle text-white/70 max-w-2xl mx-auto">
+						Transformons vos idées en réalité avec des solutions innovantes
 					</p>
 				</div>
 
-				{/* Types de collaboration - Grille verticale corrigée */}
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-8 mb-16">
-					{collaborationTypes.map((type, index) => (
+				{/* Types de collaboration */}
+				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+					{collaborationTypes.map((type) => (
 						<div
 							key={type.id}
-							className={`liquid-glass p-6 h-full group cursor-pointer transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/10 transform hover:scale-[1.02] ${
-								hoveredCard === type.id ? 'bg-white/5' : ''
-							} ${selectedType === type.id ? 'ring-2 ring-blue-500/50' : ''}`}
-							onMouseEnter={() => setHoveredCard(type.id)}
-							onMouseLeave={() => setHoveredCard(null)}
+							className={`morphing-card liquid-glass p-6 cursor-pointer transition-all duration-300 ${
+								selectedType === type.id ? 'ring-2 ring-white/30 scale-105' : ''
+							}`}
 							onClick={() =>
-								setSelectedType(
-									selectedType === type.id ? null : type.id
-								)
+								setSelectedType(selectedType === type.id ? null : type.id)
 							}
-							style={{
-								animationDelay: `${index * 150}ms`,
-							}}
 						>
-							{/* Header de carte */}
-							<div className="text-center mb-6">
-								<div
-									className={`w-16 h-16 rounded-xl bg-gradient-to-r ${type.gradient} flex items-center justify-center text-3xl shadow-lg mx-auto mb-4 group-hover:scale-110 transition-transform duration-300`}
-								>
-									{type.icon}
-								</div>
-								<h3 className="text-lg font-bold text-white mb-2 group-hover:text-blue-300 transition-colors">
-									{type.title}
-								</h3>
-								<p className="text-white/80 text-sm leading-relaxed">
-									{type.description}
-								</p>
+							<div className="flex items-center mb-4">
+								<div className="text-3xl mr-3">{type.icon}</div>
+								<h3 className="text-lg font-bold text-white">{type.title}</h3>
 							</div>
 
-							{/* Fonctionnalités */}
-							<div className="space-y-3">
-								<div className="text-xs text-white/60 font-medium text-center">
-									Inclus :
-								</div>
-								<div className="space-y-2">
-									{type.features.map((feature, featureIndex) => (
-										<div
-											key={featureIndex}
-											className="flex items-center gap-2 text-sm text-white/90"
-										>
-											<div className="w-1.5 h-1.5 bg-blue-400 rounded-full flex-shrink-0"></div>
-											<span>{feature}</span>
-										</div>
-									))}
-								</div>
+							<p className="text-white/70 mb-4 text-sm">
+								{type.description}
+							</p>
+
+							<div className="space-y-2">
+								{type.features.map((feature, index) => (
+									<div
+										key={index}
+										className="flex items-center text-sm text-white/80"
+									>
+										<div className="w-2 h-2 bg-white/50 rounded-full mr-2"></div>
+										{feature}
+									</div>
+								))}
 							</div>
 
-							{/* Bouton d'action */}
-							<div className="mt-6 pt-4 border-t border-white/10">
-								<button
-									className={`w-full py-2 px-4 rounded-lg text-sm font-medium transition-all duration-300 ${
-										selectedType === type.id
-											? 'bg-blue-500/20 text-blue-300 border border-blue-500/50'
-											: 'bg-white/5 text-white/80 hover:bg-white/10 hover:text-white border border-white/20 hover:border-white/40'
-									}`}
-								>
-									{selectedType === type.id
-										? 'Sélectionné ✓'
-										: 'En savoir plus'}
-								</button>
-							</div>
+							{selectedType === type.id && (
+								<div className="mt-4 pt-4 border-t border-white/20">
+									<div
+										className={`w-full h-1 bg-gradient-to-r ${type.gradient} rounded-full`}
+									/>
+								</div>
+							)}
 						</div>
 					))}
 				</div>
 
-				{/* Section contact et planning */}
-				<div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
-					{/* Formulaire de contact simplifié */}
-					<div className="liquid-glass p-8">
-						<h3 className="text-2xl font-bold text-white mb-6 text-center">
-							📧 Discutons de votre projet
+				{/* Formulaire de contact et booking */}
+				<div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+					{/* Formulaire de qualification */}
+					<div className="liquid-glass p-8 rounded-2xl">
+						<h3 className="text-2xl font-bold text-white mb-6">
+							Parlez-moi de votre projet
 						</h3>
-						<div className="space-y-6">
+
+						<form onSubmit={handleSubmit} className="space-y-4">
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-								<div>
-									<label className="block text-sm text-white/80 mb-2">
-										Nom *
-									</label>
-									<input
-										type="text"
-										className="w-full p-3 bg-white/10 text-white rounded-lg border border-white/20 focus:border-blue-500/50 outline-none transition-colors"
-										placeholder="Votre nom"
-									/>
-								</div>
-								<div>
-									<label className="block text-sm text-white/80 mb-2">
-										Email *
-									</label>
-									<input
-										type="email"
-										className="w-full p-3 bg-white/10 text-white rounded-lg border border-white/20 focus:border-blue-500/50 outline-none transition-colors"
-										placeholder="votre@email.com"
-									/>
-								</div>
+								<input
+									type="text"
+									placeholder="Nom *"
+									className="glass-input w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-accent-blue"
+									value={formData.name}
+									onChange={(e) =>
+										setFormData({ ...formData, name: e.target.value })
+									}
+									required
+								/>
+								<input
+									type="email"
+									placeholder="Email *"
+									className="glass-input w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-accent-blue"
+									value={formData.email}
+									onChange={(e) =>
+										setFormData({ ...formData, email: e.target.value })
+									}
+									required
+								/>
 							</div>
 
-							<div>
-								<label className="block text-sm text-white/80 mb-2">
-									Type de collaboration
-								</label>
-								<select className="w-full p-3 bg-white/10 text-white rounded-lg border border-white/20 focus:border-blue-500/50 outline-none">
-									<option value="">Sélectionnez un type</option>
-									{collaborationTypes.map((type) => (
-										<option key={type.id} value={type.id}>
-											{type.title}
-										</option>
-									))}
-								</select>
+							<input
+								type="text"
+								placeholder="Entreprise"
+								className="glass-input w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-accent-blue"
+								value={formData.company}
+								onChange={(e) =>
+									setFormData({ ...formData, company: e.target.value })
+								}
+							/>
+
+							<select
+								className="glass-input w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-accent-blue"
+								value={formData.type}
+								onChange={(e) =>
+									setFormData({ ...formData, type: e.target.value })
+								}
+								required
+							>
+								<option value="">Type de collaboration *</option>
+								{collaborationTypes.map((type) => (
+									<option
+										key={type.id}
+										value={type.id}
+										className="bg-gray-800"
+									>
+										{type.title}
+									</option>
+								))}
+							</select>
+
+							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+								<input
+									type="text"
+									placeholder="Budget estimé"
+									className="glass-input w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-accent-blue"
+									value={formData.budget}
+									onChange={(e) =>
+										setFormData({ ...formData, budget: e.target.value })
+									}
+								/>
+								<input
+									type="text"
+									placeholder="Timeline souhaité"
+									className="glass-input w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-accent-blue"
+									value={formData.timeline}
+									onChange={(e) =>
+										setFormData({ ...formData, timeline: e.target.value })
+									}
+								/>
 							</div>
 
-							<div>
-								<label className="block text-sm text-white/80 mb-2">
-									Message *
-								</label>
-								<textarea
-									rows={4}
-									className="w-full p-3 bg-white/10 text-white rounded-lg border border-white/20 focus:border-blue-500/50 outline-none transition-colors resize-none"
-									placeholder="Décrivez votre projet et vos besoins..."
-								></textarea>
-							</div>
+							<textarea
+								placeholder="Décrivez votre projet *"
+								rows={4}
+								className="glass-input w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-accent-blue resize-none"
+								value={formData.message}
+								onChange={(e) =>
+									setFormData({ ...formData, message: e.target.value })
+								}
+								required
+							/>
 
-							<button className="w-full py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-lg hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-[1.02]">
-								Envoyer le message 🚀
+							<button
+								type="submit"
+								className="glass-button w-full px-6 py-4 text-white font-medium"
+							>
+								Envoyer ma demande
 							</button>
-						</div>
+						</form>
 					</div>
 
-					{/* Planning et disponibilités */}
-					<div className="liquid-glass p-8">
-						<h3 className="text-2xl font-bold text-white mb-6 text-center">
-							📅 Planifier un rendez-vous
+					{/* Section booking */}
+					<div className="liquid-glass p-8 rounded-2xl">
+						<h3 className="text-2xl font-bold text-white mb-6">
+							Réservez un créneau
 						</h3>
 
 						<div className="space-y-6">
-							{/* Calendrier simplifié */}
-							<div className="bg-white/5 rounded-lg p-4">
-								<h4 className="text-lg font-semibold text-white mb-4">
-									Disponibilités cette semaine
-								</h4>
-								<div className="space-y-3">
-									{['Lundi 15h-17h', 'Mercredi 14h-16h', 'Vendredi 10h-12h'].map(
-										(slot, index) => (
-											<button
-												key={index}
-												className="w-full p-3 bg-white/10 text-white rounded-lg border border-white/20 hover:border-green-500/50 hover:bg-green-500/10 transition-all duration-300 text-left"
-											>
-												<span className="font-medium">{slot}</span>
-												<span className="float-right text-green-400">
-													✓ Disponible
-												</span>
-											</button>
-										)
-									)}
-								</div>
-							</div>
+							<div className="text-white/80">
+								<p className="mb-4">
+									Discutons directement de votre projet lors d'un appel de
+									découverte gratuit de 30 minutes.
+								</p>
 
-							{/* Informations de contact */}
-							<div className="space-y-4">
-								<div className="text-center">
-									<p className="text-white/80 mb-4">
-										Ou contactez-moi directement :
-									</p>
-									<div className="space-y-2">
-										<a
-											href="mailto:contact@taak61.com"
-											className="block text-blue-400 hover:text-blue-300 transition-colors"
-										>
-											📧 contact@taak61.com
-										</a>
-										<a
-											href="tel:+33123456789"
-											className="block text-blue-400 hover:text-blue-300 transition-colors"
-										>
-											📞 +33 1 23 45 67 89
-										</a>
-										<div className="text-white/70">
-											📍 Paris, France (Remote possible)
-										</div>
+								<div className="space-y-3">
+									<div className="flex items-center">
+										<span className="text-green-400 mr-3">✓</span>
+										<span>Analyse de faisabilité</span>
+									</div>
+									<div className="flex items-center">
+										<span className="text-green-400 mr-3">✓</span>
+										<span>Estimation de coûts</span>
+									</div>
+									<div className="flex items-center">
+										<span className="text-green-400 mr-3">✓</span>
+										<span>Recommandations techniques</span>
+									</div>
+									<div className="flex items-center">
+										<span className="text-green-400 mr-3">✓</span>
+										<span>Plan d'action personnalisé</span>
 									</div>
 								</div>
 							</div>
 
-							<div className="text-center pt-4 border-t border-white/10">
-								<p className="text-sm text-white/60">
-									⚡ Réponse garantie sous 24h
-								</p>
+							<div className="border-t border-white/20 pt-6">
+								<h4 className="text-white font-semibold mb-3">
+									Créneaux disponibles :
+								</h4>
+								<div className="space-y-2 text-sm text-white/70">
+									<div>🕐 Lundi - Vendredi : 9h - 18h</div>
+									<div>🌍 Fuseau horaire : GMT+1 (Paris)</div>
+									<div>📞 Appel vidéo ou téléphonique</div>
+								</div>
 							</div>
+
+							<button
+								onClick={handleSetmoreBooking}
+								className="glass-button w-full px-6 py-4 text-white font-medium group"
+							>
+								<span className="flex items-center justify-center">
+									<span className="mr-2">📅</span>
+									Réserver maintenant
+									<svg
+										className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform"
+										fill="none"
+										stroke="currentColor"
+										viewBox="0 0 24 24"
+									>
+										<path
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											strokeWidth={2}
+											d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+										/>
+									</svg>
+								</span>
+							</button>
+
+							<p className="text-xs text-white/50 text-center">
+								Vous serez redirigé vers Setmore pour choisir votre créneau
+							</p>
 						</div>
 					</div>
 				</div>
-
-				{/* Section testimonials/process */}
-				<div className="text-center">
-					<h3 className="text-2xl font-bold text-white mb-8">
-						🌟 Processus de collaboration
-					</h3>
-					<div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-						{[
-							{
-								step: '1',
-								title: 'Analyse',
-								description:
-									'Étude approfondie de votre projet et définition des objectifs',
-								icon: '🔍',
-							},
-							{
-								step: '2',
-								title: 'Conception',
-								description:
-									'Création de la solution technique adaptée à vos besoins',
-								icon: '⚙️',
-							},
-							{
-								step: '3',
-								title: 'Réalisation',
-								description:
-									'Développement et livraison de votre projet avec accompagnement',
-								icon: '🚀',
-							},
-						].map((process, index) => (
-							<div
-								key={index}
-								className="liquid-glass p-6 text-center group hover:bg-white/5 transition-all duration-300"
-							>
-								<div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-2xl mx-auto mb-4 group-hover:scale-110 transition-transform">
-									{process.icon}
-								</div>
-								<div className="text-sm text-blue-400 font-medium mb-2">
-									Étape {process.step}
-								</div>
-								<h4 className="text-lg font-bold text-white mb-3">
-									{process.title}
-								</h4>
-								<p className="text-white/80 text-sm leading-relaxed">
-									{process.description}
-								</p>
-							</div>
-						))}
-					</div>
-				</div>
 			</div>
-
-			{/* Effets visuels d'arrière-plan */}
-			<div className="absolute top-1/4 right-16 w-2 h-2 bg-blue-400 rounded-full animate-pulse opacity-60"></div>
-			<div className="absolute bottom-1/4 left-24 w-3 h-3 bg-purple-400 rounded-full animate-pulse opacity-40 delay-1000"></div>
-			<div className="absolute top-3/4 right-1/3 w-1 h-1 bg-white rounded-full animate-pulse opacity-80 delay-500"></div>
 		</section>
 	);
 }
