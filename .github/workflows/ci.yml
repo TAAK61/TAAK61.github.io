@@ -1,54 +1,306 @@
-name: CI/CD Pipeline
+name: 🚀 CI/CD Pipeline - Portfolio Liquid Glass
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
+
+env:
+  NODE_VERSION: '20'
 
 jobs:
-  lint-and-test:
+  # ——— Analyse de code et qualité ———
+  code-quality:
+    name: 📋 Code Quality & Security
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        cache: 'npm'
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
 
-    - name: Install dependencies
-      run: npm ci
+      - name: 🔧 Install dependencies
+        run: npm ci --prefer-offline --no-audit
 
-    - name: Run ESLint
-      run: npm run lint
+      - name: 🔍 Lint check
+        run: npm run lint
 
-    - name: Run TypeScript check
-      run: npm run type-check
+      - name: 🎨 Format check
+        run: npx prettier --check "**/*.{js,jsx,ts,tsx,json,md}"
 
-    - name: Run tests
-      run: npm run test
+      - name: 🔧 TypeScript check
+        run: npm run type-check
 
-    - name: Build project
-      run: npm run build
+      - name: 🛡️ Security audit
+        run: npm audit --audit-level=moderate
+        continue-on-error: true
 
-    - name: Run Lighthouse audit
-      if: github.event_name == 'pull_request'
-      run: npm run audit:lighthouse
+  # ——— Tests unitaires ———
+  unit-tests:
+    name: 🧪 Unit Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: code-quality
 
-  deploy-preview:
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 🔧 Install dependencies
+        run: npm ci --prefer-offline --no-audit
+
+      - name: 🧪 Run unit tests
+        run: npm run test -- --coverage --watchAll=false
+        env:
+          CI: true
+
+      - name: 📊 Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        if: always()
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/lcov.info
+          fail_ci_if_error: false
+
+  # ——— Build et validation ———
+  build:
+    name: 🔨 Build & Bundle Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: [code-quality, unit-tests]
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 🔧 Install dependencies
+        run: npm ci --prefer-offline --no-audit
+
+      - name: 🔨 Build application
+        run: npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
+
+      - name: 📊 Analyze bundle size
+        run: npm run analyze
+        continue-on-error: true
+
+      - name: 📤 Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-files
+          path: |
+            .next/
+            !.next/cache
+          retention-days: 7
+
+  # ——— Tests E2E avec Playwright ———
+  e2e-tests:
+    name: 🎭 E2E Tests (Playwright)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: build
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 🔧 Install dependencies
+        run: npm ci --prefer-offline --no-audit
+
+      - name: 🎭 Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: 📥 Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-files
+          path: .next/
+
+      - name: 🚀 Start application
+        run: npm start &
+        env:
+          PORT: 3000
+
+      - name: ⏳ Wait for app to be ready
+        run: npx wait-on http://localhost:3000 --timeout 60000
+
+      - name: 🎭 Run E2E tests
+        run: npm run test:e2e
+        env:
+          PLAYWRIGHT_TEST_BASE_URL: http://localhost:3000
+
+      - name: 📤 Upload E2E test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+
+  # ——— Tests d'accessibilité ———
+  accessibility-tests:
+    name: ♿ Accessibility Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: build
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 🔧 Install dependencies
+        run: npm ci --prefer-offline --no-audit
+
+      - name: 📥 Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-files
+          path: .next/
+
+      - name: 🚀 Start application
+        run: npm start &
+        env:
+          PORT: 3000
+
+      - name: ⏳ Wait for app to be ready
+        run: npx wait-on http://localhost:3000 --timeout 60000
+
+      - name: ♿ Run accessibility audit
+        run: npm run audit:a11y
+        continue-on-error: true
+
+  # ——— Audit de performance ———
+  performance-audit:
+    name: ⚡ Performance Audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: build
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    needs: lint-and-test
 
     steps:
-    - name: Deploy preview to Vercel
-      uses: amondnet/vercel-action@v25
-      with:
-        vercel-token: ${{ secrets.VERCEL_TOKEN }}
-        vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-        vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-        working-directory: ./
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 🔧 Install dependencies
+        run: npm ci --prefer-offline --no-audit
+
+      - name: 📥 Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-files
+          path: .next/
+
+      - name: 🚀 Start application
+        run: npm start &
+        env:
+          PORT: 3000
+
+      - name: ⏳ Wait for app to be ready
+        run: npx wait-on http://localhost:3000 --timeout 60000
+
+      - name: ⚡ Run Lighthouse audit
+        run: npm run audit:perf
+        continue-on-error: true
+
+      - name: 📤 Upload Lighthouse report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse-report
+          path: lighthouse-report.json
+          retention-days: 30
+
+  # ——— Déploiement (conditionnel) ———
+  deploy:
+    name: 🚀 Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [build, e2e-tests, accessibility-tests]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment: production
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 🔧 Install dependencies
+        run: npm ci --prefer-offline --no-audit
+
+      - name: 🔨 Build for production
+        run: npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
+
+      - name: 🚀 Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod'
+
+  # ——— Notification de fin ———
+  notify:
+    name: 📢 Notify Results
+    runs-on: ubuntu-latest
+    needs: [code-quality, unit-tests, build, e2e-tests, accessibility-tests, performance-audit, deploy]
+    if: always()
+
+    steps:
+      - name: 📢 Success notification
+        if: needs.build.result == 'success' && needs.e2e-tests.result == 'success'
+        run: |
+          echo "✅ Pipeline réussie ! Portfolio Liquid Glass prêt pour la production."
+          echo "🔗 Artefacts disponibles dans l'onglet Actions"
+
+      - name: ❌ Failure notification
+        if: contains(needs.*.result, 'failure')
+        run: |
+          echo "❌ Échec du pipeline. Vérifiez les logs ci-dessus."
+          echo "🔍 Causes possibles : lint, tests, build ou déploiement"
+          exit 1

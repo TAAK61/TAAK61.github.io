@@ -29,10 +29,11 @@ export function IntelligentChatbot({ isHidden, onToggleVisibility }: Intelligent
   const [isTyping, setIsTyping] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
-  // Position dans la zone de la section hero (côté droit)
+
+  // Position fixe en bas à droite, visible sur tout le site
   const [position, setPosition] = useState({
-    x: typeof window !== 'undefined' ? window.innerWidth - 88 : 300,
-    y: typeof window !== 'undefined' ? window.innerHeight - 150 : 650
+    x: typeof window !== 'undefined' ? window.innerWidth - 100 : 0,
+    y: typeof window !== 'undefined' ? window.innerHeight - 100 : 0
   });
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -74,6 +75,76 @@ export function IntelligentChatbot({ isHidden, onToggleVisibility }: Intelligent
     }
   ];
 
+  // Initialisation des messages
+  useEffect(() => {
+    if (messages.length === 0) {
+      setMessages(welcomeMessages);
+    }
+  }, []);
+
+  // Scroll automatique vers le bas
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  // Mise à jour de la position lors du redimensionnement
+  useEffect(() => {
+    const handleResize = () => {
+      if (!isDragging) {
+        setPosition(prev => ({
+          x: Math.min(prev.x, window.innerWidth - 80),
+          y: Math.min(prev.y, window.innerHeight - 80)
+        }));
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [isDragging]);
+
+  // Gestion du drag
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging) return;
+
+      const newX = e.clientX - dragRef.current.offsetX;
+      const newY = e.clientY - dragRef.current.offsetY;
+
+      // Contraintes pour garder le widget dans l'écran
+      const maxX = window.innerWidth - 80;
+      const maxY = window.innerHeight - 80;
+
+      setPosition({
+        x: Math.max(0, Math.min(newX, maxX)),
+        y: Math.max(0, Math.min(newY, maxY))
+      });
+    };
+
+    const handleMouseUp = () => {
+      setIsDragging(false);
+    };
+
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging]);
+
+  const getSuggestions = (category: string): string[] => {
+    const suggestions = {
+      expertise: ['Quelles technologies utilises-tu ?', 'Peux-tu développer en blockchain ?'],
+      projects: ['Montre-moi le portfolio 3D', 'Parle-moi du crypto tracker'],
+      contact: ['Comment puis-je te contacter ?', 'Quel est ton tarif ?'],
+      experience: ['Quel est ton parcours ?', 'Depuis quand codes-tu ?']
+    };
+    return suggestions[category as keyof typeof suggestions] || [];
+  };
+
   // Intelligence artificielle simulée
   const processAIResponse = (userMessage: string): AIResponse => {
     const message = userMessage.toLowerCase();
@@ -99,47 +170,18 @@ export function IntelligentChatbot({ isHidden, onToggleVisibility }: Intelligent
     if (message.includes('merci')) {
       return {
         text: "De rien ! 🙏 N'hésitez pas si vous avez d'autres questions sur le travail de Kiame.",
-        suggestions: ['Voir le portfolio', 'Planifier un call', 'Ses technologies']
+        suggestions: ['Voir ses projets', 'Ses technologies', 'Le contacter']
       };
     }
 
-    // Réponse par défaut intelligente
+    // Réponse par défaut
     return {
-      text: "Interessant ! 🤔 Je peux vous parler des compétences de Kiame, de ses projets innovants, ou vous aider à entrer en contact avec lui. Que vous intéresse le plus ?",
-      suggestions: ['Ses expertises', 'Ses réalisations', 'Collaborer ensemble']
+      text: "Intéressant ! 🤔 Je peux vous parler des compétences de Kiame, ses projets, ou comment le contacter. Que préférez-vous ?",
+      suggestions: ['Ses compétences', 'Ses projets', 'Le contacter']
     };
   };
 
-  const getSuggestions = (category: string): string[] => {
-    const suggestions = {
-      expertise: ['Technologies 3D', 'Blockchain & DeFi', 'IA et Machine Learning'],
-      projects: ['Portfolio interactif', 'Apps crypto', 'Expériences VR/AR'],
-      contact: ['Planifier un appel', 'Voir ses disponibilités', 'Discuter d\'un projet'],
-      experience: ['Ses formations', 'Ses réalisations', 'Son approche']
-    };
-    return suggestions[category as keyof typeof suggestions] || [];
-  };
-
-  // Initialisation
-  useEffect(() => {
-    if (messages.length === 0) {
-      setMessages(welcomeMessages);
-    }
-  }, []);
-
-  // Auto-scroll
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-
-  // Focus input when opened
-  useEffect(() => {
-    if (isOpen && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [isOpen]);
-
-  const sendMessage = async (text: string) => {
+  const sendMessage = (text: string) => {
     if (!text.trim()) return;
 
     const userMessage: Message = {
@@ -196,241 +238,206 @@ export function IntelligentChatbot({ isHidden, onToggleVisibility }: Intelligent
     };
   };
 
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (!isDragging) return;
-
-    const newX = e.clientX - dragRef.current.offsetX;
-    const newY = e.clientY - dragRef.current.offsetY;
-
-    // Permettre le déplacement libre sur tout l'écran
-    setPosition({
-      x: Math.max(0, Math.min(window.innerWidth - 64, newX)),
-      y: Math.max(0, Math.min(window.innerHeight - 64, newY))
-    });
-  }, [isDragging]);
-
-  const handleMouseUp = useCallback(() => {
-    setIsDragging(false);
-  }, []);
-
-  useEffect(() => {
-    if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-      return () => {
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp);
-      };
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage(inputValue);
     }
-  }, [isDragging, handleMouseMove, handleMouseUp]);
+  };
 
-  if (isHidden) {
-    return null;
-  }
+  const formatMessage = (text: string) => {
+    return text.split('\n').map((line, index) => {
+      if (line.startsWith('**') && line.endsWith('**')) {
+        return (
+          <div key={index} className="font-bold text-purple-300 mb-1">
+            {line.slice(2, -2)}
+          </div>
+        );
+      }
+      if (line.startsWith('•')) {
+        return (
+          <div key={index} className="ml-4 mb-1">
+            <span className="text-purple-400">•</span>
+            <span className="ml-2">{line.slice(1).trim()}</span>
+          </div>
+        );
+      }
+      return line && (
+        <div key={index} className="mb-1">
+          {line}
+        </div>
+      );
+    });
+  };
+
+  if (isHidden) return null;
 
   return (
-    <>
-      {/* Bouton flottant */}
-      <motion.div
+    <motion.div
+      className="fixed z-[9999]"
+      style={{
+        top: `${position.y}px`,
+        left: `${position.x}px`,
+        pointerEvents: 'auto'
+      }}
+      initial={{ scale: 0, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{ duration: 0.3 }}
+    >
+      {/* Widget principal */}
+      <div
+        className="fixed z-[9999]"
+        onMouseDown={handleMouseDown}
         style={{
-          position: 'fixed',
           top: `${position.y}px`,
           left: `${position.x}px`,
-          zIndex: 2147483643, // Z-index maximum JavaScript - 4
-          cursor: isDragging ? 'grabbing' : 'grab',
-          pointerEvents: 'auto' // Assurer l'interactivité
+          cursor: isDragging ? 'grabbing' : (!isOpen ? 'grab' : 'default'),
+          pointerEvents: 'auto'
         }}
-        onMouseDown={handleMouseDown}
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ type: "spring", stiffness: 260, damping: 20 }}
       >
-        <motion.button
-          onClick={!isDragging ? toggleChat : undefined}
-          className="relative w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg shadow-purple-500/25 border-2 border-purple-400/30 backdrop-blur-xl"
-          whileHover={{ scale: isDragging ? 1 : 1.1 }}
-          whileTap={{ scale: isDragging ? 1 : 0.95 }}
+        {/* Bouton principal du chatbot */}
+        <motion.div
+          onClick={toggleChat}
+          className="relative w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-600 rounded-full flex items-center justify-center cursor-pointer shadow-2xl border-2 border-white/20"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
           title="Assistant IA Portfolio"
         >
-          <motion.div
-            animate={{ rotate: isOpen ? 180 : 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            {isOpen ? '💬' : '🤖'}
-          </motion.div>
+          <AnimatePresence mode="wait">
+            {isOpen ? (
+              <motion.div
+                key="close"
+                initial={{ rotate: -90, opacity: 0 }}
+                animate={{ rotate: 0, opacity: 1 }}
+                exit={{ rotate: 90, opacity: 0 }}
+                className="text-white text-2xl"
+              >
+                ✕
+              </motion.div>
+            ) : (
+              <motion.div
+                key="chat"
+                initial={{ rotate: 90, opacity: 0 }}
+                animate={{ rotate: 0, opacity: 1 }}
+                exit={{ rotate: -90, opacity: 0 }}
+                className="text-white text-2xl"
+              >
+                💬
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-          {/* Badge de messages non lus */}
-          {unreadCount > 0 && (
+          {/* Badge de notification */}
+          {unreadCount > 0 && !isOpen && (
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold"
+              className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold"
             >
-              {unreadCount}
+              {unreadCount > 9 ? '9+' : unreadCount}
             </motion.div>
           )}
+        </motion.div>
 
-          {/* Animation de pulsation */}
+        {/* Bouton de masquage séparé */}
+        {onToggleVisibility && (
           <motion.div
-            className="absolute inset-0 rounded-full border-2 border-purple-400"
-            animate={{ scale: [1, 1.2], opacity: [1, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          />
-        </motion.button>
-
-        {/* Bouton masquer (en dehors du bouton principal) */}
-        <motion.button
-          onClick={(e) => {
-            e.stopPropagation();
-            onToggleVisibility?.();
-          }}
-          className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center text-white text-xs opacity-0 hover:opacity-100 transition-opacity"
-          title="Masquer le chatbot"
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-        >
-          ×
-        </motion.button>
-      </motion.div>
-
-      {/* Interface du chat */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            style={{
-              position: 'fixed',
-              top: `${Math.max(0, position.y - 520)}px`,
-              left: `${Math.max(0, Math.min(window.innerWidth - 384, position.x - 320))}px`,
-              zIndex: 2147483642, // Z-index maximum JavaScript - 5
-              pointerEvents: 'auto', // Assurer l'interactivité
-              width: '24rem',
-              height: '500px'
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleVisibility();
             }}
-            className="bg-black/90 backdrop-blur-xl rounded-2xl border border-white/20 flex flex-col shadow-2xl"
+            className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center cursor-pointer text-white text-xs"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            title="Masquer le chatbot"
           >
-            {/* Header */}
-            <div className="p-4 border-b border-white/10 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-blue-600 rounded-full flex items-center justify-center">
-                  🤖
-                </div>
-                <div>
-                  <h3 className="text-white font-semibold">Assistant IA</h3>
-                  <p className="text-white/60 text-xs">Portfolio de Kiame</p>
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onToggleVisibility?.();
-                  }}
-                  className="text-white/60 hover:text-red-400 transition-colors text-sm px-2 py-1 hover:bg-white/10 rounded"
-                  title="Masquer définitivement"
-                >
-                  🗑️
-                </button>
-                <button
-                  onClick={toggleChat}
-                  className="text-white/60 hover:text-white transition-colors text-lg"
-                  title="Fermer"
-                >
-                  ×
-                </button>
-              </div>
-            </div>
-
-            {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {messages.map((message) => (
-                <motion.div
-                  key={message.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div
-                    className={`max-w-[80%] p-3 rounded-2xl ${
-                      message.sender === 'user'
-                        ? 'bg-blue-500 text-white'
-                        : 'bg-white/10 text-white border border-white/20'
-                    }`}
-                  >
-                    <p className="text-sm whitespace-pre-line">{message.text}</p>
-                    <p className="text-xs opacity-60 mt-1">
-                      {message.timestamp.toLocaleTimeString()}
-                    </p>
-                  </div>
-                </motion.div>
-              ))}
-
-              {/* Indicateur de frappe */}
-              {isTyping && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="flex justify-start"
-                >
-                  <div className="bg-white/10 p-3 rounded-2xl border border-white/20">
-                    <div className="flex gap-1">
-                      {[...Array(3)].map((_, i) => (
-                        <motion.div
-                          key={i}
-                          className="w-2 h-2 bg-white/60 rounded-full"
-                          animate={{ opacity: [0.3, 1, 0.3] }}
-                          transition={{ duration: 1, repeat: Infinity, delay: i * 0.2 }}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-
-              <div ref={messagesEndRef} />
-            </div>
-
-            {/* Suggestions rapides */}
-            <div className="p-2 border-t border-white/10">
-              <div className="flex flex-wrap gap-2 mb-2">
-                {['Ses compétences', 'Ses projets', 'Le contacter'].map((suggestion) => (
-                  <button
-                    key={suggestion}
-                    onClick={() => handleSuggestionClick(suggestion)}
-                    className="text-xs px-3 py-1 bg-white/10 hover:bg-white/20 text-white/80 rounded-full transition-all"
-                  >
-                    {suggestion}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Input */}
-            <div className="p-4 border-t border-white/10">
-              <div className="flex gap-2">
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && sendMessage(inputValue)}
-                  placeholder="Posez votre question..."
-                  className="flex-1 bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-white placeholder-white/60 text-sm focus:outline-none focus:border-blue-400"
-                />
-                <button
-                  onClick={() => sendMessage(inputValue)}
-                  disabled={!inputValue.trim()}
-                  className="px-4 py-2 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-600 disabled:opacity-50 text-white rounded-xl transition-all"
-                >
-                  ↗
-                </button>
-              </div>
-            </div>
+            ✕
           </motion.div>
         )}
-      </AnimatePresence>
-    </>
+
+        {/* Interface de chat */}
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.8, y: 20 }}
+              className="absolute bottom-20 right-0 w-80 h-96 bg-black/90 backdrop-blur-xl rounded-2xl border border-white/20 shadow-2xl flex flex-col overflow-hidden"
+            >
+              {/* Header */}
+              <div className="bg-gradient-to-r from-purple-600 to-blue-600 p-4 text-white">
+                <h3 className="font-bold">Assistant IA Portfolio</h3>
+                <p className="text-sm opacity-90">Posez-moi vos questions sur Kiame !</p>
+              </div>
+
+              {/* Messages */}
+              <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                {messages.map((message) => (
+                  <div
+                    key={message.id}
+                    className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                  >
+                    <div
+                      className={`max-w-[80%] p-3 rounded-2xl ${
+                        message.sender === 'user'
+                          ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white'
+                          : 'bg-white/10 backdrop-blur-sm text-gray-100'
+                      }`}
+                    >
+                      <div className="text-sm leading-relaxed">
+                        {formatMessage(message.text)}
+                      </div>
+                      <div className="text-xs opacity-70 mt-1">
+                        {message.timestamp.toLocaleTimeString('fr-FR', {
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                {/* Indicateur de frappe */}
+                {isTyping && (
+                  <div className="flex justify-start">
+                    <div className="bg-white/10 backdrop-blur-sm text-gray-100 p-3 rounded-2xl">
+                      <div className="flex space-x-1">
+                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div ref={messagesEndRef} />
+              </div>
+
+              {/* Input */}
+              <div className="p-4 border-t border-white/10">
+                <div className="flex space-x-2">
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    placeholder="Votre message..."
+                    className="flex-1 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-purple-400"
+                  />
+                  <button
+                    onClick={() => sendMessage(inputValue)}
+                    disabled={!inputValue.trim()}
+                    className="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-4 py-2 rounded-lg hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    ➤
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </motion.div>
   );
 }

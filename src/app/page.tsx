@@ -1,49 +1,35 @@
 'use client';
 
-import { Suspense } from 'react';
-import { HeroSection } from '@/components/sections/HeroSection';
-import { ExpertiseSection } from '@/components/sections/ExpertiseSection';
-import { PortfolioSection } from '@/components/sections/PortfolioSection';
-import { CollaborationSection } from '@/components/sections/CollaborationSection';
-import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
-import TransitionEffects from '@/components/TransitionEffects';
+import dynamic from 'next/dynamic';
+import HeroSection from '@/components/sections/HeroSection';
+import ExpertiseSection from '@/components/sections/ExpertiseSection';
+import Footer from '@/components/Footer';
+
+// Chargement différé des composants lourds
+const PortfolioSection = dynamic(() => import('@/components/sections/PortfolioSection'), {
+  loading: () => (
+    <div className="min-h-screen flex items-center justify-center bg-black">
+      <div className="text-white text-xl">Chargement du portfolio...</div>
+    </div>
+  ),
+});
+
+const CollaborationSection = dynamic(() => import('@/components/sections/CollaborationSection'), {
+  loading: () => (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-purple-900">
+      <div className="text-white text-xl">Chargement des informations de contact...</div>
+    </div>
+  ),
+});
 
 export default function Home() {
   return (
-    <>
-      {/* Contenu principal - les widgets globaux sont gérés par GlobalWidgetsProvider */}
-      <main className="relative">
-        {/* Effets de transition entre sections */}
-        <TransitionEffects activeSection="hero" />
-
-        {/* Section Hero */}
-        <section id="hero" className="animate-fade-in-scale">
-          <Suspense fallback={<LoadingSpinner />}>
-            <HeroSection />
-          </Suspense>
-        </section>
-
-        {/* Section Expertise */}
-        <section id="expertise" className="animate-slide-in-left">
-          <Suspense fallback={<LoadingSpinner />}>
-            <ExpertiseSection />
-          </Suspense>
-        </section>
-
-        {/* Section Portfolio */}
-        <section id="portfolio" className="animate-slide-in-right">
-          <Suspense fallback={<LoadingSpinner />}>
-            <PortfolioSection />
-          </Suspense>
-        </section>
-
-        {/* Section Collaboration */}
-        <section id="collaboration" className="animate-slide-in-bottom">
-          <Suspense fallback={<LoadingSpinner />}>
-            <CollaborationSection />
-          </Suspense>
-        </section>
-      </main>
-    </>
+    <main className="min-h-screen">
+      <HeroSection />
+      <ExpertiseSection />
+      <PortfolioSection />
+      <CollaborationSection />
+      <Footer />
+    </main>
   );
 }

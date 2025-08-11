@@ -1,218 +1,715 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
 
-// Import dynamique du composant Portfolio3DGallery pour éviter les erreurs SSR
-const Portfolio3DGallery = dynamic(() => import('../three/Portfolio3DGallery').then(mod => ({ default: mod.Portfolio3DGallery })), {
-  ssr: false,
-  loading: () => (
-    <div className="relative w-full h-96 bg-gradient-to-br from-blue-900/20 to-purple-900/20 rounded-2xl animate-pulse flex items-center justify-center">
-      <div className="flex flex-col items-center gap-4">
-        <div className="w-12 h-12 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>
-        <span className="text-white/60">Chargement de la galerie 3D...</span>
+// Import dynamique de la galerie 3D avec typage correct
+const Portfolio3DGallery = dynamic(
+  () => import('../three/Portfolio3DGallery').then((mod) => ({ default: mod.default })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="text-white/60 text-center">
+          <div className="w-8 h-8 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin mx-auto mb-2"></div>
+          <p>Chargement de la galerie 3D...</p>
+        </div>
       </div>
-    </div>
-  )
-});
+    )
+  }
+);
 
-export function PortfolioSection() {
-  const [viewMode, setViewMode] = useState<'3d' | 'grid'>('3d');
+// 3 projets par catégorie selon le cahier des charges
+const portfolioData = [
+  // Projets Réalisés
+  {
+    id: 'liquid-portfolio',
+    title: 'Portfolio Liquid Glass',
+    category: 'Réalisé',
+    type: 'Web Immersif',
+    description: 'Portfolio révolutionnaire avec effets Liquid Glass, distorsion temps réel et navigation 3D',
+    technologies: ['Next.js', 'Three.js', 'Liquid Glass CSS', 'WebXR', 'Framer Motion'],
+    status: 'Live',
+    year: '2024',
+    isVREnabled: true,
+    isNFT: false,
+    cryptoIntegration: false
+  },
+  {
+    id: 'defi-tracker',
+    title: 'DeFi Portfolio Tracker',
+    category: 'Réalisé',
+    type: 'Blockchain/DeFi',
+    description: 'Tracking temps réel de portefeuille DeFi avec analyse multi-chaînes et yield farming',
+    technologies: ['React', 'Web3.js', 'Ethereum', 'Polygon', 'Chart.js'],
+    status: 'Live',
+    year: '2024',
+    isVREnabled: false,
+    isNFT: false,
+    cryptoIntegration: true
+  },
+  {
+    id: 'vr-showroom',
+    title: 'VR Immersive Showroom',
+    category: 'Réalisé',
+    type: 'VR/AR',
+    description: 'Showroom virtuel immersif pour présentation produits avec interactions naturelles',
+    technologies: ['WebXR', 'Three.js', 'A-Frame', 'Spatial Audio', 'Unity'],
+    status: 'Live',
+    year: '2023',
+    isVREnabled: true,
+    isNFT: false,
+    cryptoIntegration: false
+  },
+  // Projets Conceptuels
+  {
+    id: 'metaverse-platform',
+    title: 'Metaverse Business Platform',
+    category: 'Conceptuel',
+    type: 'Metaverse/Web3',
+    description: 'Plateforme metaverse pour réunions business avec économie NFT intégrée',
+    technologies: ['WebXR', 'Blockchain', 'NFT', 'Spatial Computing', 'AI'],
+    status: 'Concept',
+    year: '2024',
+    isVREnabled: true,
+    isNFT: true,
+    cryptoIntegration: true
+  },
+  {
+    id: 'ai-crypto-advisor',
+    title: 'AI Crypto Investment Advisor',
+    category: 'Conceptuel',
+    type: 'IA/Blockchain',
+    description: 'Conseiller IA pour investissements crypto avec prédictions avancées',
+    technologies: ['TensorFlow', 'Blockchain Analysis', 'NLP', 'Predictive AI', 'DeFi'],
+    status: 'Concept',
+    year: '2024',
+    isVREnabled: false,
+    isNFT: false,
+    cryptoIntegration: true
+  },
+  {
+    id: 'sustainable-nft',
+    title: 'Sustainable NFT Marketplace',
+    category: 'Conceptuel',
+    type: 'Green Tech/NFT',
+    description: 'Marketplace NFT écologique avec compensation carbone automatique',
+    technologies: ['Sustainable Blockchain', 'Carbon Credits', 'Green NFT', 'Impact Tracking'],
+    status: 'Concept',
+    year: '2024',
+    isVREnabled: false,
+    isNFT: true,
+    cryptoIntegration: true
+  }
+];
+
+const categories = ['Tous', 'Réalisé', 'Conceptuel'];
+
+export default function PortfolioSection() {
+  const [activeCategory, setActiveCategory] = useState('Tous');
+  const [selectedProject, setSelectedProject] = useState<string | null>(null);
+  const [isVisible, setIsVisible] = useState(false);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [show3DGallery, setShow3DGallery] = useState(true);
+
+  const filteredProjects = activeCategory === 'Tous'
+    ? portfolioData
+    : portfolioData.filter(project => project.category === activeCategory);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry && entry.isIntersecting) {
+          setIsVisible(true);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    const section = document.getElementById('portfolio');
+    if (section) observer.observe(section);
+
+    // Mouse tracking pour les effets de réfraction
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePosition({
+        x: (e.clientX / window.innerWidth) * 100,
+        y: (e.clientY / window.innerHeight) * 100
+      });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, []);
 
   return (
-    <section className="min-h-screen py-20 px-4 relative overflow-hidden">
-      {/* Arrière-plan cohérent */}
-      <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-900"></div>
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.1),transparent_50%)]"></div>
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(147,51,234,0.1),transparent_50%)]"></div>
+    <section id="portfolio" className="min-h-screen py-20 relative overflow-hidden">
+      {/* Liquid Glass Background avec effet cristal */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: `
+            radial-gradient(circle at ${mousePosition.x}% ${mousePosition.y}%, 
+              rgba(147, 51, 234, 0.08) 0%, 
+              rgba(79, 70, 229, 0.04) 30%, 
+              transparent 60%),
+            linear-gradient(180deg, 
+              rgba(20, 20, 40, 0.95) 0%, 
+              rgba(0, 0, 0, 0.9) 50%, 
+              rgba(30, 20, 50, 0.95) 100%)
+          `,
+          backdropFilter: 'blur(25px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(25px) saturate(180%)',
+        }}
+      >
+        {/* Effet cristal crypto avec SVG */}
+        <svg className="absolute inset-0 w-full h-full opacity-15">
+          <defs>
+            <filter id="portfolioDistortion">
+              <feTurbulence type="fractalNoise" baseFrequency="0.015" numOctaves="3" result="noise"/>
+              <feDisplacementMap in="SourceGraphic" in2="noise" scale="20"/>
+            </filter>
+            <filter id="cryptoGlow">
+              <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+              <feMerge>
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
+          <rect width="100%" height="100%" filter="url(#portfolioDistortion)" fill="rgba(236, 72, 153, 0.03)"/>
+          <circle cx="20%" cy="30%" r="100" fill="rgba(245, 158, 11, 0.1)" filter="url(#cryptoGlow)"/>
+          <circle cx="80%" cy="70%" r="150" fill="rgba(147, 51, 234, 0.1)" filter="url(#cryptoGlow)"/>
+        </svg>
+      </div>
 
-      <div className="container-responsive relative z-10">
-        {/* Header de section unifié */}
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-3 mb-6">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
-              <span className="text-2xl">💼</span>
-            </div>
-            <h2 className="text-title bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent font-bold">
-              Portfolio
+      {/* Particules crypto flottantes */}
+      <div className="absolute inset-0 pointer-events-none">
+        {[...Array(15)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+            }}
+            animate={{
+              y: [0, -200, 0],
+              opacity: [0, 0.6, 0],
+              scale: [0.5, 1.8, 0.5],
+              rotateZ: [0, 360, 720]
+            }}
+            transition={{
+              duration: 8 + Math.random() * 4,
+              repeat: Infinity,
+              delay: Math.random() * 4,
+              ease: "easeInOut"
+            }}
+          >
+            {i % 3 === 0 ? (
+              <div className="w-2 h-2 bg-yellow-400/30 rounded-full" />
+            ) : i % 3 === 1 ? (
+              <div className="w-1 h-1 bg-purple-400/40 rounded-full" />
+            ) : (
+              <div className="w-1.5 h-1.5 bg-blue-400/30 rounded-full" />
+            )}
+          </motion.div>
+        ))}
+      </div>
+
+      <div className="container mx-auto px-6 relative z-10">
+        {/* Header avec showcase NFT */}
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 50 }}
+          transition={{ duration: 1 }}
+          className="text-center mb-16"
+        >
+          <motion.div
+            className="inline-block p-8 rounded-3xl mb-8"
+            style={{
+              background: `
+                linear-gradient(135deg, 
+                  rgba(255, 255, 255, 0.12) 0%, 
+                  rgba(255, 255, 255, 0.06) 100%)
+              `,
+              backdropFilter: 'blur(25px) saturate(200%)',
+              border: '1px solid rgba(255, 255, 255, 0.25)',
+              boxShadow: `
+                inset 0 1px 0 rgba(255, 255, 255, 0.4),
+                0 25px 50px rgba(0, 0, 0, 0.3),
+                0 0 100px rgba(147, 51, 234, 0.2)
+              `
+            }}
+          >
+            <h2
+              className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-white via-purple-100 to-blue-100 bg-clip-text text-transparent mb-4"
+              style={{
+                textShadow: '0 0 40px rgba(255, 255, 255, 0.3)'
+              }}
+            >
+              Portfolio Immersif
             </h2>
-          </div>
+            <p className="text-xl text-white/80 max-w-3xl mx-auto mb-6">
+              Galerie 3D • Portails VR/AR • Showcase NFT dynamique
+            </p>
 
-          <p className="text-subtitle text-white/80 max-w-3xl mx-auto leading-relaxed">
-            Découvrez mes créations et projets innovants à travers une expérience 3D immersive,
-            alliant technologie et créativité pour repousser les limites du possible.
-          </p>
-
-          {/* Sélecteur de vue cohérent */}
-          <div className="flex items-center justify-center gap-4 mt-8">
-            <button
-              onClick={() => setViewMode('3d')}
-              className={`liquid-glass px-6 py-3 rounded-xl transition-all duration-300 ${
-                viewMode === '3d' 
-                  ? 'bg-blue-500/20 text-blue-300 border-blue-500/50 shadow-lg shadow-blue-500/20' 
-                  : 'text-white/70 hover:text-white hover:bg-white/5'
-              }`}
+            {/* Toggle 3D Gallery */}
+            <motion.button
+              onClick={() => setShow3DGallery(!show3DGallery)}
+              className="px-6 py-3 rounded-full font-semibold text-white"
+              style={{
+                background: `
+                  linear-gradient(135deg, 
+                    rgba(147, 51, 234, 0.8) 0%, 
+                    rgba(79, 70, 229, 0.8) 100%)
+                `,
+                backdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255, 255, 255, 0.3)',
+                boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.3)'
+              }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
-              <span className="mr-2">🎮</span>
-              Vue 3D Interactive
-            </button>
-            <button
-              onClick={() => setViewMode('grid')}
-              className={`liquid-glass px-6 py-3 rounded-xl transition-all duration-300 ${
-                viewMode === 'grid' 
-                  ? 'bg-purple-500/20 text-purple-300 border-purple-500/50 shadow-lg shadow-purple-500/20' 
-                  : 'text-white/70 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <span className="mr-2">📋</span>
-              Vue Grille
-            </button>
-          </div>
-        </div>
+              {show3DGallery ? '📱 Vue Liste' : '🎮 Navigation 3D'}
+            </motion.button>
+          </motion.div>
+        </motion.div>
 
-        {/* Contenu principal */}
-        <div className="relative">
-          {viewMode === '3d' ? (
-            <div className="relative">
+        {/* Galerie 3D Immersive */}
+        <AnimatePresence>
+          {show3DGallery && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              transition={{ duration: 0.8 }}
+              className="relative h-96 mb-16 rounded-3xl overflow-hidden"
+              style={{
+                background: `
+                  linear-gradient(135deg, 
+                    rgba(255, 255, 255, 0.08) 0%, 
+                    rgba(255, 255, 255, 0.04) 100%)
+                `,
+                backdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                boxShadow: `
+                  inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                  0 20px 40px rgba(0, 0, 0, 0.3)
+                `
+              }}
+            >
               <Portfolio3DGallery />
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {/* Grille de projets en fallback */}
-              {[
-                {
-                  title: 'Portfolio Liquid Glass',
-                  category: 'Web Development',
-                  description: 'Portfolio personnel avec effets Liquid Glass et intégration 3D',
-                  technologies: ['Next.js', 'Three.js', 'TypeScript', 'Tailwind'],
-                  status: 'En cours',
-                  icon: '🌐'
-                },
-                {
-                  title: 'Crypto Tracker',
-                  category: 'Blockchain',
-                  description: 'Application de suivi des cryptomonnaies en temps réel',
-                  technologies: ['React', 'Node.js', 'WebSocket', 'Chart.js'],
-                  status: 'Terminé',
-                  icon: '₿'
-                },
-                {
-                  title: 'AR Experience',
-                  category: 'VR/AR',
-                  description: 'Expérience de réalité augmentée pour l\'éducation',
-                  technologies: ['Unity', 'ARCore', 'C#', 'Blender'],
-                  status: 'Prototype',
-                  icon: '🥽'
-                },
-                {
-                  title: 'AI Assistant',
-                  category: 'Intelligence Artificielle',
-                  description: 'Assistant virtuel intelligent avec NLP avancé',
-                  technologies: ['Python', 'TensorFlow', 'OpenAI', 'FastAPI'],
-                  status: 'En développement',
-                  icon: '🤖'
-                },
-                {
-                  title: 'DeFi Platform',
-                  category: 'Blockchain',
-                  description: 'Plateforme décentralisée de finance participative',
-                  technologies: ['Solidity', 'Web3.js', 'React', 'Ethereum'],
-                  status: 'Concept',
-                  icon: '💎'
-                }
-              ].map((project, index) => (
-                <div key={index} className="liquid-glass p-6 hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-300 group">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="text-3xl">{project.icon}</div>
-                    <span className={`text-xs px-3 py-1 rounded-full ${
-                      project.status === 'Terminé' ? 'bg-green-500/20 text-green-300' :
-                      project.status === 'En cours' ? 'bg-blue-500/20 text-blue-300' :
-                      project.status === 'En développement' ? 'bg-yellow-500/20 text-yellow-300' :
-                      'bg-purple-500/20 text-purple-300'
-                    }`}>
-                      {project.status}
-                    </span>
+
+              {/* Overlay avec contrôles VR */}
+              <div className="absolute top-4 right-4 flex gap-2">
+                <motion.button
+                  className="px-4 py-2 rounded-lg text-white text-sm"
+                  style={{
+                    background: `
+                      linear-gradient(135deg, 
+                        rgba(255, 255, 255, 0.15) 0%, 
+                        rgba(255, 255, 255, 0.08) 100%)
+                    `,
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(255, 255, 255, 0.3)'
+                  }}
+                  whileHover={{ scale: 1.05 }}
+                >
+                  🥽 Mode VR
+                </motion.button>
+                <motion.button
+                  className="px-4 py-2 rounded-lg text-white text-sm"
+                  style={{
+                    background: `
+                      linear-gradient(135deg, 
+                        rgba(255, 255, 255, 0.15) 0%, 
+                        rgba(255, 255, 255, 0.08) 100%)
+                    `,
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(255, 255, 255, 0.3)'
+                  }}
+                  whileHover={{ scale: 1.05 }}
+                >
+                  📱 Mode AR
+                </motion.button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Filtres de catégorie avec effet liquid */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 30 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+          className="flex flex-wrap justify-center gap-4 mb-12"
+        >
+          {categories.map((category) => (
+            <motion.button
+              key={category}
+              onClick={() => setActiveCategory(category)}
+              className="px-8 py-4 rounded-full font-semibold transition-all duration-300"
+              style={{
+                background: activeCategory === category
+                  ? `linear-gradient(135deg, rgba(147, 51, 234, 0.8) 0%, rgba(79, 70, 229, 0.8) 100%)`
+                  : `linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)`,
+                backdropFilter: 'blur(20px)',
+                border: `1px solid ${activeCategory === category ? 'rgba(147, 51, 234, 0.5)' : 'rgba(255, 255, 255, 0.2)'}`,
+                boxShadow: activeCategory === category
+                  ? 'inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 10px 30px rgba(147, 51, 234, 0.3)'
+                  : 'inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+                color: 'white'
+              }}
+              whileHover={{ scale: 1.05, y: -2 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              {category}
+            </motion.button>
+          ))}
+        </motion.div>
+
+        {/* Grille de projets avec portails VR/AR */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 30 }}
+          transition={{ duration: 0.6, delay: 0.6 }}
+          className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
+        >
+          {filteredProjects.map((project, index) => (
+            <motion.div
+              key={project.id}
+              layout
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              className="group relative"
+              onMouseEnter={() => setSelectedProject(project.id)}
+              onMouseLeave={() => setSelectedProject(null)}
+            >
+              {/* Card Liquid Glass avec effet cristal par type */}
+              <motion.div
+                className="relative p-6 rounded-3xl h-full"
+                style={{
+                  background: `
+                    linear-gradient(135deg, 
+                      rgba(255, 255, 255, 0.12) 0%, 
+                      rgba(255, 255, 255, 0.06) 50%,
+                      rgba(255, 255, 255, 0.08) 100%)
+                  `,
+                  backdropFilter: 'blur(25px) saturate(200%)',
+                  border: '1px solid rgba(255, 255, 255, 0.25)',
+                  boxShadow: `
+                    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+                    0 20px 40px rgba(0, 0, 0, 0.3),
+                    0 0 60px ${project.cryptoIntegration ? 'rgba(245, 158, 11, 0.3)' : 'rgba(147, 51, 234, 0.2)'}
+                  `
+                }}
+                whileHover={{
+                  scale: 1.02,
+                  y: -10,
+                  rotateY: 5,
+                  boxShadow: `
+                    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+                    0 30px 60px rgba(0, 0, 0, 0.4),
+                    0 0 100px ${project.cryptoIntegration ? 'rgba(245, 158, 11, 0.4)' : 'rgba(147, 51, 234, 0.3)'}
+                  `
+                }}
+              >
+                {/* Badges de statut */}
+                <div className="flex justify-between items-start mb-4">
+                  <div className="flex gap-2">
+                    {project.isVREnabled && (
+                      <motion.span
+                        className="px-2 py-1 rounded-full text-xs"
+                        style={{
+                          background: 'linear-gradient(135deg, rgba(147, 51, 234, 0.8) 0%, rgba(79, 70, 229, 0.8) 100%)',
+                          backdropFilter: 'blur(10px)',
+                          border: '1px solid rgba(255, 255, 255, 0.3)',
+                          color: 'white'
+                        }}
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ delay: index * 0.1 + 0.2 }}
+                      >
+                        🥽 VR/AR
+                      </motion.span>
+                    )}
+                    {project.isNFT && (
+                      <motion.span
+                        className="px-2 py-1 rounded-full text-xs"
+                        style={{
+                          background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.8) 0%, rgba(251, 191, 36, 0.8) 100%)',
+                          backdropFilter: 'blur(10px)',
+                          border: '1px solid rgba(255, 255, 255, 0.3)',
+                          color: 'white'
+                        }}
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ delay: index * 0.1 + 0.3 }}
+                      >
+                        💎 NFT
+                      </motion.span>
+                    )}
+                    {project.cryptoIntegration && (
+                      <motion.span
+                        className="px-2 py-1 rounded-full text-xs"
+                        style={{
+                          background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.8) 0%, rgba(22, 163, 74, 0.8) 100%)',
+                          backdropFilter: 'blur(10px)',
+                          border: '1px solid rgba(255, 255, 255, 0.3)',
+                          color: 'white'
+                        }}
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ delay: index * 0.1 + 0.4 }}
+                      >
+                        ₿ Crypto
+                      </motion.span>
+                    )}
                   </div>
 
-                  <h3 className="text-xl font-bold text-white mb-3 group-hover:text-blue-300 transition-colors">
-                    {project.title}
-                  </h3>
-                  <p className="text-white/80 mb-4 text-sm leading-relaxed">
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                      project.status === 'Live' 
+                        ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
+                        : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                    }`}
+                  >
+                    {project.status}
+                  </span>
+                </div>
+
+                {/* Contenu du projet */}
+                <div className="space-y-4">
+                  <div>
+                    <h3
+                      className="text-xl font-bold text-white mb-1"
+                      style={{ textShadow: '0 0 20px rgba(255, 255, 255, 0.3)' }}
+                    >
+                      {project.title}
+                    </h3>
+                    <p className="text-purple-300 text-sm font-medium">{project.type}</p>
+                    <span className="text-white/50 text-xs">{project.year}</span>
+                  </div>
+
+                  <p className="text-white/80 text-sm leading-relaxed">
                     {project.description}
                   </p>
 
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {project.technologies.slice(0, 3).map((tech, techIndex) => (
-                      <span key={techIndex} className="text-xs px-2 py-1 bg-white/10 text-white/90 rounded">
+                  <div className="flex flex-wrap gap-1">
+                    {project.technologies.slice(0, 3).map((tech) => (
+                      <span
+                        key={tech}
+                        className="px-2 py-1 text-xs rounded"
+                        style={{
+                          background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)',
+                          backdropFilter: 'blur(5px)',
+                          border: '1px solid rgba(255, 255, 255, 0.2)',
+                          color: 'rgba(255, 255, 255, 0.8)'
+                        }}
+                      >
                         {tech}
                       </span>
                     ))}
                     {project.technologies.length > 3 && (
-                      <span className="text-xs px-2 py-1 bg-white/10 text-white/70 rounded">
+                      <span className="text-white/50 text-xs px-2 py-1">
                         +{project.technologies.length - 3}
                       </span>
                     )}
                   </div>
-
-                  {/* Boutons d'action pour la vue grille */}
-                  <div className="flex gap-2 mt-4">
-                    <button className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white text-sm rounded-lg hover:from-blue-600 hover:to-purple-600 transition-all">
-                      Voir le projet
-                    </button>
-                    <button className="flex-1 px-4 py-2 border border-white/20 text-white text-sm rounded-lg hover:bg-white/5 transition-all">
-                      Code source
-                    </button>
-                  </div>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
 
-        {/* Statistiques de portfolio */}
-        <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6">
-          {[
-            { number: '5+', label: 'Projets Actifs', icon: '🚀' },
-            { number: '3+', label: 'Technologies', icon: '⚡' },
-            { number: '100%', label: 'Open Source', icon: '🌟' },
-            { number: '24/7', label: 'Innovation', icon: '💡' }
-          ].map((stat, index) => (
-            <div key={index} className="liquid-glass p-4 text-center group hover:bg-white/5 transition-all duration-300">
-              <div className="text-2xl mb-2">{stat.icon}</div>
-              <div className="text-2xl font-bold text-white mb-1">{stat.number}</div>
-              <div className="text-sm text-white/70">{stat.label}</div>
-            </div>
+                {/* Portails d'accès */}
+                <div className="flex gap-2 mt-6">
+                  <motion.button
+                    className="flex-1 py-2 px-4 rounded-lg text-sm font-semibold text-white"
+                    style={{
+                      background: `
+                        linear-gradient(135deg, 
+                          rgba(147, 51, 234, 0.8) 0%, 
+                          rgba(79, 70, 229, 0.8) 100%)
+                      `,
+                      backdropFilter: 'blur(10px)',
+                      border: '1px solid rgba(255, 255, 255, 0.3)'
+                    }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    {project.isVREnabled ? '🥽 Explorer VR' : '👁️ Voir détails'}
+                  </motion.button>
+
+                  {project.status === 'Live' && (
+                    <motion.button
+                      className="px-4 py-2 rounded-lg text-sm font-semibold text-white"
+                      style={{
+                        background: `
+                          linear-gradient(135deg, 
+                            rgba(255, 255, 255, 0.1) 0%, 
+                            rgba(255, 255, 255, 0.05) 100%)
+                        `,
+                        backdropFilter: 'blur(10px)',
+                        border: '1px solid rgba(255, 255, 255, 0.3)'
+                      }}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      🚀 Live
+                    </motion.button>
+                  )}
+                </div>
+
+                {/* Effet de hover liquide */}
+                <AnimatePresence>
+                  {selectedProject === project.id && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      className="absolute inset-0 rounded-3xl"
+                      style={{
+                        background: `
+                          linear-gradient(135deg, 
+                            ${project.cryptoIntegration ? 'rgba(245, 158, 11, 0.1)' : 'rgba(147, 51, 234, 0.1)'} 0%, 
+                            rgba(255, 255, 255, 0.05) 50%,
+                            ${project.cryptoIntegration ? 'rgba(245, 158, 11, 0.1)' : 'rgba(147, 51, 234, 0.1)'} 100%)
+                        `,
+                        border: `2px solid ${project.cryptoIntegration ? 'rgba(245, 158, 11, 0.4)' : 'rgba(147, 51, 234, 0.4)'}`
+                      }}
+                    />
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            </motion.div>
           ))}
-        </div>
-      </div>
+        </motion.div>
 
-      {/* Effets visuels d'arrière-plan */}
-      <div className="absolute top-1/4 left-10 w-2 h-2 bg-blue-400 rounded-full animate-pulse opacity-60"></div>
-      <div className="absolute top-3/4 right-20 w-3 h-3 bg-purple-400 rounded-full animate-pulse opacity-40 delay-1000"></div>
-      <div className="absolute bottom-1/4 left-1/3 w-1 h-1 bg-white rounded-full animate-pulse opacity-80 delay-500"></div>
-
-      {/* Instructions d'interaction pour la vue 3D */}
-      {viewMode === '3d' && (
-        <div className="mt-12 text-center">
-          <div className="liquid-glass p-6 max-w-2xl mx-auto">
-            <h3 className="text-white font-semibold mb-4">🎮 Comment interagir</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-white/80">
-              <div className="flex items-center gap-2">
-                <span>🖱️</span>
-                <span>Survolez pour agrandir</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span>👆</span>
-                <span>Cliquez pour les détails</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span>🎤</span>
-                <span>Utilisez les commandes vocales</span>
-              </div>
-            </div>
+        {/* Portfolio crypto temps réel */}
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 50 }}
+          transition={{ duration: 1, delay: 1 }}
+          className="mt-16 relative p-8 rounded-3xl"
+          style={{
+            background: `
+              linear-gradient(135deg, 
+                rgba(245, 158, 11, 0.08) 0%, 
+                rgba(255, 255, 255, 0.04) 100%)
+            `,
+            backdropFilter: 'blur(20px) saturate(180%)',
+            border: '1px solid rgba(245, 158, 11, 0.3)',
+            boxShadow: `
+              inset 0 1px 0 rgba(255, 255, 255, 0.3),
+              0 20px 40px rgba(0, 0, 0, 0.2),
+              0 0 60px rgba(245, 158, 11, 0.2)
+            `
+          }}
+        >
+          <div className="text-center mb-8">
+            <h3
+              className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-yellow-300 via-orange-300 to-yellow-200 bg-clip-text text-transparent mb-4"
+              style={{
+                textShadow: '0 0 30px rgba(245, 158, 11, 0.4)'
+              }}
+            >
+              🚀 Innovation Showcase
+            </h3>
+            <p className="text-white/70 max-w-2xl mx-auto">
+              Explorez mes projets blockchain et metaverse qui repoussent les limites de l'innovation technologique
+            </p>
           </div>
-        </div>
-      )}
+
+          {/* Statistiques crypto en temps réel */}
+          <div className="grid md:grid-cols-3 gap-6 mb-8">
+            <motion.div
+              className="text-center p-6 rounded-2xl"
+              style={{
+                background: `
+                  linear-gradient(135deg, 
+                    rgba(34, 197, 94, 0.1) 0%, 
+                    rgba(255, 255, 255, 0.05) 100%)
+                `,
+                backdropFilter: 'blur(15px)',
+                border: '1px solid rgba(34, 197, 94, 0.3)'
+              }}
+              whileHover={{ scale: 1.05, y: -5 }}
+            >
+              <div className="text-3xl font-bold text-green-400 mb-2">6</div>
+              <div className="text-white/70 text-sm">Projets Blockchain</div>
+            </motion.div>
+
+            <motion.div
+              className="text-center p-6 rounded-2xl"
+              style={{
+                background: `
+                  linear-gradient(135deg, 
+                    rgba(147, 51, 234, 0.1) 0%, 
+                    rgba(255, 255, 255, 0.05) 100%)
+                `,
+                backdropFilter: 'blur(15px)',
+                border: '1px solid rgba(147, 51, 234, 0.3)'
+              }}
+              whileHover={{ scale: 1.05, y: -5 }}
+            >
+              <div className="text-3xl font-bold text-purple-400 mb-2">3</div>
+              <div className="text-white/70 text-sm">Expériences VR/AR</div>
+            </motion.div>
+
+            <motion.div
+              className="text-center p-6 rounded-2xl"
+              style={{
+                background: `
+                  linear-gradient(135deg, 
+                    rgba(245, 158, 11, 0.1) 0%, 
+                    rgba(255, 255, 255, 0.05) 100%)
+                `,
+                backdropFilter: 'blur(15px)',
+                border: '1px solid rgba(245, 158, 11, 0.3)'
+              }}
+              whileHover={{ scale: 1.05, y: -5 }}
+            >
+              <div className="text-3xl font-bold text-yellow-400 mb-2">2</div>
+              <div className="text-white/70 text-sm">Marketplaces NFT</div>
+            </motion.div>
+          </div>
+
+          {/* Call to action */}
+          <div className="text-center">
+            <motion.button
+              className="px-8 py-4 rounded-full font-semibold text-white"
+              style={{
+                background: `
+                  linear-gradient(135deg, 
+                    rgba(245, 158, 11, 0.9) 0%, 
+                    rgba(251, 191, 36, 0.9) 100%)
+                `,
+                backdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255, 255, 255, 0.3)',
+                boxShadow: `
+                  inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                  0 15px 35px rgba(245, 158, 11, 0.3)
+                `
+              }}
+              whileHover={{
+                scale: 1.05,
+                boxShadow: `
+                  inset 0 1px 0 rgba(255, 255, 255, 0.4),
+                  0 20px 40px rgba(245, 158, 11, 0.4)
+                `
+              }}
+              whileTap={{ scale: 0.95 }}
+            >
+              💼 Collaborer sur votre projet
+            </motion.button>
+          </div>
+        </motion.div>
+      </div>
     </section>
   );
 }

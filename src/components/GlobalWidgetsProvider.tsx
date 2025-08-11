@@ -27,81 +27,60 @@ interface WidgetsContextType {
 
 const WidgetsContext = createContext<WidgetsContextType | undefined>(undefined);
 
-const defaultWidgetsState: WidgetsState = {
-  voiceControls: {
-    isVisible: true,
-    isEnabled: true,
-  },
-  chatbot: {
-    isVisible: true,
-    isEnabled: true,
-  },
-};
+interface GlobalWidgetsProviderProps {
+  children: ReactNode;
+}
 
-export function GlobalWidgetsProvider({ children }: { children: ReactNode }) {
-  const [widgets, setWidgets] = useState<WidgetsState>(defaultWidgetsState);
-  const [showWidgetsMenu, setShowWidgetsMenu] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
+export function GlobalWidgetsProvider({ children }: GlobalWidgetsProviderProps) {
+  const [mounted, setMounted] = useState(false);
   const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null);
+  const [showWidgetsMenu, setShowWidgetsMenu] = useState(false);
 
-  // Créer un conteneur de portail au niveau le plus élevé
+  const [widgets, setWidgets] = useState<WidgetsState>({
+    voiceControls: {
+      isVisible: true,
+      isEnabled: true,
+    },
+    chatbot: {
+      isVisible: true,
+      isEnabled: true,
+    },
+  });
+
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      let container = document.getElementById('widgets-portal');
-      if (!container) {
-        container = document.createElement('div');
-        container.id = 'widgets-portal';
-        container.style.cssText = `
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          pointer-events: none;
-          z-index: 2147483647;
-        `;
-        document.body.appendChild(container);
-      }
-      setPortalContainer(container);
-      setIsMounted(true);
+    setMounted(true);
+
+    // Créer le conteneur pour les widgets s'il n'existe pas
+    let container = document.getElementById('widgets-portal');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'widgets-portal';
+      container.style.position = 'fixed';
+      container.style.top = '0';
+      container.style.left = '0';
+      container.style.width = '100%';
+      container.style.height = '100%';
+      container.style.pointerEvents = 'none';
+      container.style.zIndex = '2147483647'; // Z-index maximum
+      document.body.appendChild(container);
     }
+    setPortalContainer(container);
 
     return () => {
       const container = document.getElementById('widgets-portal');
-      if (container) {
-        container.remove();
+      if (container && container.parentNode) {
+        container.parentNode.removeChild(container);
       }
     };
   }, []);
-
-  // Charger l'état depuis localStorage
-  useEffect(() => {
-    setIsMounted(true);
-    const saved = localStorage.getItem('portfolio-widgets-state');
-    if (saved) {
-      try {
-        const parsedState = JSON.parse(saved);
-        setWidgets(parsedState);
-      } catch (error) {
-        console.error('Erreur lors du chargement des préférences widgets:', error);
-      }
-    }
-  }, []);
-
-  // Sauvegarder l'état dans localStorage
-  useEffect(() => {
-    if (isMounted) {
-      localStorage.setItem('portfolio-widgets-state', JSON.stringify(widgets));
-    }
-  }, [widgets, isMounted]);
 
   const toggleVoiceControls = () => {
     setWidgets(prev => ({
       ...prev,
       voiceControls: {
         ...prev.voiceControls,
-        isVisible: !prev.voiceControls.isVisible
-      }
+        isVisible: !prev.voiceControls.isVisible,
+      },
     }));
   };
 
@@ -110,14 +89,22 @@ export function GlobalWidgetsProvider({ children }: { children: ReactNode }) {
       ...prev,
       chatbot: {
         ...prev.chatbot,
-        isVisible: !prev.chatbot.isVisible
-      }
+        isVisible: !prev.chatbot.isVisible,
+      },
     }));
   };
 
   const resetWidgets = () => {
-    setWidgets(defaultWidgetsState);
-    localStorage.removeItem('portfolio-widgets-state');
+    setWidgets({
+      voiceControls: {
+        isVisible: true,
+        isEnabled: true,
+      },
+      chatbot: {
+        isVisible: true,
+        isEnabled: true,
+      },
+    });
   };
 
   const contextValue: WidgetsContextType = {
@@ -129,126 +116,111 @@ export function GlobalWidgetsProvider({ children }: { children: ReactNode }) {
     resetWidgets,
   };
 
-  if (!isMounted || !portalContainer) {
-    return <>{children}</>;
-  }
-
-  const widgetsContent = (
+  // Contenu des widgets qui sera rendu dans le portal
+  const widgetsContent = mounted && portalContainer ? (
     <>
-      {/* Widgets flottants rendus dans le portail */}
-      {widgets.voiceControls.isEnabled && (
-        <VoiceControls
-          isHidden={!widgets.voiceControls.isVisible}
-          onToggleVisibility={toggleVoiceControls}
-        />
+      {/* VoiceControls - Position fixe en haut à droite */}
+      {widgets.voiceControls.isVisible && widgets.voiceControls.isEnabled && (
+        <div
+          style={{
+            position: 'fixed',
+            top: '20px',
+            right: '20px',
+            zIndex: 2147483646,
+            pointerEvents: 'auto'
+          }}
+        >
+          <VoiceControls />
+        </div>
       )}
 
-      {widgets.chatbot.isEnabled && (
-        <IntelligentChatbot
-          isHidden={!widgets.chatbot.isVisible}
-          onToggleVisibility={toggleChatbot}
-        />
+      {/* Chatbot - Position fixe en bas à droite */}
+      {widgets.chatbot.isVisible && widgets.chatbot.isEnabled && (
+        <div
+          style={{
+            position: 'fixed',
+            bottom: '20px',
+            right: '20px',
+            zIndex: 2147483646,
+            pointerEvents: 'auto'
+          }}
+        >
+          <IntelligentChatbot
+            isHidden={false}
+            onToggleVisibility={toggleChatbot}
+          />
+        </div>
       )}
 
-      {/* Menu de contrôle des widgets */}
+      {/* Menu de configuration des widgets */}
       {showWidgetsMenu && (
         <div
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center"
-          style={{ zIndex: 2147483646, pointerEvents: 'auto' }}
-          onClick={() => setShowWidgetsMenu(false)}
+          style={{
+            position: 'fixed',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            zIndex: 2147483647,
+            pointerEvents: 'auto'
+          }}
+          className="bg-black/90 backdrop-blur-sm rounded-2xl p-6 border border-white/20"
         >
-          <div
-            className="bg-black/90 backdrop-blur-xl border border-white/20 rounded-2xl p-6 w-96 max-w-[90vw]"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-white">Préférences Widgets</h2>
+          <h3 className="text-white text-lg font-semibold mb-4">Configuration des Widgets</h3>
+
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-white">Contrôles vocaux</span>
               <button
-                onClick={() => setShowWidgetsMenu(false)}
-                className="text-white/60 hover:text-white text-2xl"
+                onClick={toggleVoiceControls}
+                className={`px-3 py-1 rounded-full text-sm ${
+                  widgets.voiceControls.isVisible
+                    ? 'bg-green-500 text-white'
+                    : 'bg-gray-500 text-white'
+                }`}
               >
-                ×
+                {widgets.voiceControls.isVisible ? 'Actif' : 'Inactif'}
               </button>
             </div>
 
-            <div className="space-y-4">
-              {/* Commandes vocales */}
-              <div className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/10">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                    🎤
-                  </div>
-                  <div>
-                    <h3 className="text-white font-semibold">Commandes Vocales</h3>
-                    <p className="text-white/60 text-sm">Navigation par la voix</p>
-                  </div>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={widgets.voiceControls.isVisible}
-                    onChange={toggleVoiceControls}
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
-                </label>
-              </div>
-
-              {/* Chatbot */}
-              <div className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/10">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-600 rounded-lg flex items-center justify-center">
-                    🤖
-                  </div>
-                  <div>
-                    <h3 className="text-white font-semibold">Assistant IA</h3>
-                    <p className="text-white/60 text-sm">Chatbot intelligent</p>
-                  </div>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={widgets.chatbot.isVisible}
-                    onChange={toggleChatbot}
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
-                </label>
-              </div>
-            </div>
-
-            <div className="flex gap-3 mt-6">
+            <div className="flex items-center justify-between">
+              <span className="text-white">Chatbot IA</span>
               <button
-                onClick={resetWidgets}
-                className="flex-1 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all border border-white/20"
+                onClick={toggleChatbot}
+                className={`px-3 py-1 rounded-full text-sm ${
+                  widgets.chatbot.isVisible
+                    ? 'bg-green-500 text-white'
+                    : 'bg-gray-500 text-white'
+                }`}
               >
-                Réinitialiser
-              </button>
-              <button
-                onClick={() => setShowWidgetsMenu(false)}
-                className="flex-1 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-xl transition-all"
-              >
-                Fermer
+                {widgets.chatbot.isVisible ? 'Actif' : 'Inactif'}
               </button>
             </div>
+          </div>
 
-            <div className="mt-4 p-3 bg-white/5 rounded-lg border border-white/10">
-              <p className="text-white/70 text-xs leading-relaxed">
-                💡 <strong>Astuce :</strong> Vous pouvez déplacer les widgets en les faisant glisser.
-                Utilisez les boutons × pour les masquer temporairement.
-              </p>
-            </div>
+          <div className="flex gap-2 mt-6">
+            <button
+              onClick={resetWidgets}
+              className="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors"
+            >
+              Réinitialiser
+            </button>
+            <button
+              onClick={() => setShowWidgetsMenu(false)}
+              className="flex-1 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors"
+            >
+              Fermer
+            </button>
           </div>
         </div>
       )}
 
-      {/* Bouton d'accès rapide aux préférences widgets */}
+      {/* Bouton de configuration des widgets */}
       <button
-        onClick={() => setShowWidgetsMenu(true)}
-        className="fixed top-4 right-4 w-12 h-12 bg-black/60 backdrop-blur-xl border border-white/20 rounded-full flex items-center justify-center text-white hover:bg-black/80 transition-all group"
+        onClick={() => setShowWidgetsMenu(!showWidgetsMenu)}
+        className="fixed bottom-20 left-4 w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-600 rounded-full flex items-center justify-center text-white shadow-lg hover:shadow-xl transition-all duration-300 group"
         title="Préférences widgets"
         style={{
-          zIndex: 2147483645,
+          zIndex: 2147483646,
           pointerEvents: 'auto'
         }}
       >
@@ -273,7 +245,15 @@ export function GlobalWidgetsProvider({ children }: { children: ReactNode }) {
         </svg>
       </button>
     </>
-  );
+  ) : null;
+
+  if (!mounted || !portalContainer) {
+    return (
+      <WidgetsContext.Provider value={contextValue}>
+        {children}
+      </WidgetsContext.Provider>
+    );
+  }
 
   return (
     <WidgetsContext.Provider value={contextValue}>
