@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState } from 'react';
+import { motion } from 'framer-motion';
 
 interface BlogPost {
   id: string;
@@ -12,7 +12,7 @@ interface BlogPost {
   publishedAt: string;
   readTime: number;
   tags: string[];
-  category: 'tech' | 'blockchain' | 'vr-ar' | 'ai' | 'startup';
+  category: 'tech' | 'vr-ar' | 'ai' | 'startup';
   featured: boolean;
   views: number;
   likes: number;
@@ -22,7 +22,7 @@ const blogPosts: BlogPost[] = [
   {
     id: 'liquid-glass-revolution',
     title: 'Liquid Glass : La Révolution du Design Web',
-    excerpt: 'Découvrez la technologie Liquid Glass que j\'ai développée pour créer des interfaces utilisateur révolutionnaires.',
+    excerpt: "Découvrez la technologie Liquid Glass que j'ai développée pour créer des interfaces utilisateur révolutionnaires.",
     content: `# Liquid Glass : La Révolution du Design Web
 
     ## Introduction
@@ -89,109 +89,6 @@ const blogPosts: BlogPost[] = [
     featured: true,
     views: 1247,
     likes: 89
-  },
-  {
-    id: 'blockchain-defi-guide',
-    title: 'Guide Complet DeFi : Créer sa Première dApp',
-    excerpt: 'Tutoriel détaillé pour développer une application décentralisée sur Ethereum avec Solidity et Web3.js.',
-    content: `# Guide Complet DeFi : Créer sa Première dApp
-
-    ## Vue d'ensemble
-    
-    Dans ce guide, nous allons créer une application DeFi complète de A à Z.
-    
-    ## Prérequis
-    
-    - Connaissance de JavaScript
-    - Notions de blockchain
-    - Node.js installé
-    - MetaMask configuré
-    
-    ## Architecture
-    
-    Notre dApp comprendra :
-    1. Smart Contract Solidity
-    2. Interface Web3.js
-    3. Frontend React
-    4. Tests automatisés
-    
-    ## Smart Contract
-    
-    \`\`\`solidity
-    pragma solidity ^0.8.0;
-    
-    contract LiquidStaking {
-        mapping(address => uint256) public stakes;
-        uint256 public totalStaked;
-        
-        function stake() external payable {
-            require(msg.value > 0, "Must stake ETH");
-            stakes[msg.sender] += msg.value;
-            totalStaked += msg.value;
-        }
-        
-        function withdraw(uint256 amount) external {
-            require(stakes[msg.sender] >= amount, "Insufficient balance");
-            stakes[msg.sender] -= amount;
-            totalStaked -= amount;
-            payable(msg.sender).transfer(amount);
-        }
-    }
-    \`\`\`
-    
-    ## Interface Web3
-    
-    \`\`\`javascript
-    import Web3 from 'web3';
-    
-    class DeFiConnector {
-      constructor() {
-        this.web3 = new Web3(window.ethereum);
-        this.contract = null;
-      }
-      
-      async connect() {
-        await window.ethereum.enable();
-        this.contract = new this.web3.eth.Contract(ABI, CONTRACT_ADDRESS);
-      }
-      
-      async stake(amount) {
-        return await this.contract.methods.stake().send({
-          from: this.account,
-          value: this.web3.utils.toWei(amount, 'ether')
-        });
-      }
-    }
-    \`\`\`
-    
-    ## Sécurité
-    
-    Points critiques :
-    - Validation des entrées
-    - Protection contre la réentrance
-    - Gestion des erreurs
-    - Audits de code
-    
-    ## Déploiement
-    
-    1. Tests sur Hardhat
-    2. Déploiement testnet
-    3. Audit sécurité
-    4. Mainnet deployment
-    
-    ## Ressources
-    
-    - [OpenZeppelin](https://openzeppelin.com/)
-    - [Hardhat](https://hardhat.org/)
-    - [Ethers.js](https://docs.ethers.io/)`,
-    author: 'Kiame Touré',
-    publishedAt: '2024-01-10',
-    readTime: 15,
-    tags: ['Blockchain', 'DeFi', 'Solidity', 'Web3'],
-    category: 'blockchain',
-    featured: true,
-    views: 2156,
-    likes: 134
   },
   {
     id: 'vr-web-development',
@@ -282,11 +179,10 @@ const blogPosts: BlogPost[] = [
 
 const categories = {
   tech: { label: 'Technologie', color: 'blue' },
-  blockchain: { label: 'Blockchain', color: 'orange' },
   'vr-ar': { label: 'VR/AR', color: 'green' },
   ai: { label: 'Intelligence Artificielle', color: 'purple' },
   startup: { label: 'Startup', color: 'pink' }
-};
+} as const;
 
 export function TechnicalBlog() {
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
@@ -310,33 +206,13 @@ export function TechnicalBlog() {
   const handlePostView = (post: BlogPost) => {
     setSelectedPost(post);
 
-    if (window.portfolioAnalytics) {
-      window.portfolioAnalytics.trackEvent({
-        action: 'blog_post_view',
-        category: 'content',
-        label: post.id,
-        metadata: {
-          title: post.title,
-          category: post.category,
-          readTime: post.readTime
-        }
-      });
-    }
+    // Utiliser la méthode publique exposée
+    window.portfolioAnalytics?.trackSectionView(`blog_view:${post.id}`);
   };
 
   const handleLike = (postId: string) => {
-    // Update likes count (in real app, this would be an API call)
-    const updatedPosts = blogPosts.map(post =>
-      post.id === postId ? { ...post, likes: post.likes + 1 } : post
-    );
-
-    if (window.portfolioAnalytics) {
-      window.portfolioAnalytics.trackEvent({
-        action: 'blog_post_like',
-        category: 'engagement',
-        label: postId
-      });
-    }
+    // Tracking uniquement (pas de persistance locale pour éviter état dérivé)
+    window.portfolioAnalytics?.trackSectionView(`blog_like:${postId}`);
   };
 
   if (selectedPost) {

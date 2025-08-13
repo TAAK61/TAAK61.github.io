@@ -19,31 +19,31 @@ export function SEOOptimizer({ currentSection = 'hero', isLoading }: SEOOptimize
   const seoData = {
     hero: {
       title: 'Kiame Touré - Concepteur Solutions IT & Digital | Portfolio Liquid Glass',
-      description: 'Concepteur et développeur de solutions IT innovantes. Expertise en VR/AR, IA, blockchain, crypto et technologies émergentes. Portfolio interactif avec Liquid Glass.',
-      keywords: 'concepteur solutions IT, développeur VR AR, expert blockchain crypto, portfolio liquid glass, kiame touré',
+      description: "Concepteur et développeur de solutions IT innovantes. Expertise en VR/AR, IA et technologies émergentes. Portfolio interactif avec Liquid Glass.",
+      keywords: 'concepteur solutions IT, développeur VR AR, portfolio liquid glass, kiame touré, experiences 3d, ia',
       canonical: 'https://kiametoure.me'
     },
     expertise: {
-      title: 'Expertise Technologique - Kiame Touré | VR/AR, IA, Blockchain',
-      description: 'Découvrez mes compétences en technologies émergentes : développement VR/AR, intelligence artificielle, blockchain/crypto, Three.js, WebXR.',
-      keywords: 'expertise VR AR, développement IA, blockchain développeur, three.js expert, webxr spécialiste',
+      title: 'Expertise Technologique - Kiame Touré | VR/AR, IA',
+      description: "Découvrez mes compétences en technologies émergentes : développement VR/AR, intelligence artificielle, Three.js, WebXR.",
+      keywords: 'expertise VR AR, développement IA, three.js expert, webxr spécialiste',
       canonical: 'https://kiametoure.me#expertise'
     },
     portfolio: {
       title: 'Portfolio Projets - Kiame Touré | Réalisations IT & Digital',
-      description: 'Explorez mes projets innovants : applications VR/AR, plateformes blockchain, solutions IA, expériences 3D immersives.',
-      keywords: 'projets VR AR, applications blockchain, portfolio développeur, solutions IA, projets three.js',
+      description: "Explorez mes projets innovants : applications VR/AR, solutions IA, expériences 3D et interfaces performantes.",
+      keywords: 'projets VR AR, portfolio développeur, solutions IA, projets three.js',
       canonical: 'https://kiametoure.me#portfolio'
     },
     collaboration: {
       title: 'Collaboration & Contact - Kiame Touré | Devis et Partenariats',
-      description: 'Contactez-moi pour vos projets IT innovants. Disponible pour collaborations, conseil technologique et développement sur mesure.',
+      description: "Contactez-moi pour vos projets IT innovants. Disponible pour collaborations, conseil technologique et développement sur mesure.",
       keywords: 'contact développeur, collaboration IT, conseil technologique, devis développement, partenariat tech',
       canonical: 'https://kiametoure.me#collaboration'
     }
-  };
+  } as const;
 
-  const currentSEO = seoData[currentSection as keyof typeof seoData] || seoData.hero;
+  const currentSEO = (seoData as any)[currentSection] || seoData.hero;
 
   if (!mounted) return null;
 
@@ -107,8 +107,6 @@ export function SEOOptimizer({ currentSection = 'hero', isLoading }: SEOOptimize
             "knowsAbout": [
               "Développement VR/AR",
               "Intelligence Artificielle",
-              "Blockchain",
-              "Cryptomonnaies",
               "Three.js",
               "WebXR",
               "Technologies Immersives"

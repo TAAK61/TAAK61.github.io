@@ -15,13 +15,17 @@ interface Project3D {
   rotation: { x: number; y: number; z: number };
 }
 
-// Configuration des projets avec positions 3D optimisées
+interface Portfolio3DGalleryProps {
+  onProjectSelect?: (projectId: string) => void;
+}
+
+// Configuration des projets avec positions 3D optimisées (sans blockchain/Web3)
 const projects3D: Project3D[] = [
   {
     id: 'liquid-glass-portfolio',
     title: 'Portfolio Liquid Glass',
-    category: 'Web Development',
-    description: 'Portfolio personnel avec effets Liquid Glass et intégration 3D',
+    category: 'Web',
+    description: "Portfolio personnel avec effets Liquid Glass et intégration 3D",
     technologies: ['Next.js', 'Three.js', 'TypeScript', 'Tailwind'],
     status: 'En cours',
     color: 'from-blue-500 to-purple-600',
@@ -29,10 +33,10 @@ const projects3D: Project3D[] = [
     rotation: { x: 5, y: 15, z: 2 }
   },
   {
-    id: 'crypto-tracker',
-    title: 'Crypto Tracker',
-    category: 'Blockchain',
-    description: 'Application de suivi des cryptomonnaies en temps réel',
+    id: 'realtime-dashboard',
+    title: 'Tableau de Bord Temps Réel',
+    category: 'Data Viz',
+    description: 'Suivi de métriques temps réel avec charts interactifs',
     technologies: ['React', 'Node.js', 'WebSocket', 'Chart.js'],
     status: 'Terminé',
     color: 'from-yellow-500 to-orange-600',
@@ -43,7 +47,7 @@ const projects3D: Project3D[] = [
     id: 'ar-experience',
     title: 'AR Experience',
     category: 'VR/AR',
-    description: 'Expérience de réalité augmentée pour l\'éducation',
+    description: "Expérience de réalité augmentée pour l'éducation",
     technologies: ['Unity', 'ARCore', 'C#', 'Blender'],
     status: 'Prototype',
     color: 'from-purple-500 to-pink-600',
@@ -51,37 +55,26 @@ const projects3D: Project3D[] = [
     rotation: { x: 10, y: 20, z: 5 }
   },
   {
-    id: 'defi-platform',
-    title: 'DeFi Platform',
-    category: 'Blockchain',
-    description: 'Plateforme décentralisée de finance participative',
-    technologies: ['Solidity', 'Web3.js', 'React', 'Ethereum'],
+    id: 'collaboration-platform',
+    title: 'Plateforme Collaborative',
+    category: 'SaaS',
+    description: 'Espace collaboratif pour équipes distribuées',
+    technologies: ['WebRTC', 'Node.js', 'React', 'Redis'],
     status: 'Concept',
-    color: 'from-indigo-500 to-blue-600',
+    color: 'from-emerald-500 to-teal-600',
     position: { x: 0, y: 100, z: 0 },
     rotation: { x: 0, y: 0, z: 8 }
   },
   {
-    id: 'metaverse-platform',
-    title: 'Metaverse Platform',
-    category: 'Web3',
-    description: 'Plateforme metaverse pour collaboration en entreprise',
-    technologies: ['WebXR', 'Blockchain', 'Three.js', 'AI'],
-    status: 'Concept',
+    id: 'creative-marketplace',
+    title: 'Marketplace Créative',
+    category: 'E-commerce',
+    description: 'Place de marché pour contenus numériques',
+    technologies: ['Next.js', 'Prisma', 'PostgreSQL', 'Stripe'],
+    status: 'En cours',
     color: 'from-green-500 to-teal-600',
     position: { x: 90, y: 0, z: -20 },
     rotation: { x: -10, y: -20, z: -5 }
-  },
-  {
-    id: 'nft-marketplace',
-    title: 'NFT Marketplace',
-    category: 'Blockchain',
-    description: 'Marketplace décentralisée pour les NFT artistiques',
-    technologies: ['Solidity', 'React', 'IPFS', 'Web3'],
-    status: 'Live',
-    color: 'from-pink-500 to-red-600',
-    position: { x: 0, y: -120, z: 10 },
-    rotation: { x: -15, y: 0, z: 0 }
   }
 ];
 
@@ -167,7 +160,7 @@ const ProjectCard3D = memo(({ project, isHovered, onHover, onLeave }: {
 ProjectCard3D.displayName = 'ProjectCard3D';
 
 // Composant principal Portfolio3DGallery
-const Portfolio3DGallery = memo(() => {
+const Portfolio3DGallery = memo(({ onProjectSelect }: Portfolio3DGalleryProps) => {
   const [hoveredProject, setHoveredProject] = useState<string | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -187,6 +180,13 @@ const Portfolio3DGallery = memo(() => {
     setHoveredProject(null);
   }, []);
 
+  const handleClick = useCallback(() => {
+    if (onProjectSelect) {
+      const id = hoveredProject || projects3D[0]?.id || 'unknown';
+      onProjectSelect(id);
+    }
+  }, [onProjectSelect, hoveredProject]);
+
   return (
     <div
       ref={containerRef}
@@ -195,6 +195,9 @@ const Portfolio3DGallery = memo(() => {
         perspective: '1200px',
         transformStyle: 'preserve-3d'
       }}
+      role="img"
+      aria-label="Portfolio 3D"
+      onClick={handleClick}
     >
       {/* Background animé */}
       <div
@@ -286,4 +289,5 @@ const Portfolio3DGallery = memo(() => {
 
 Portfolio3DGallery.displayName = 'Portfolio3DGallery';
 
+export { Portfolio3DGallery };
 export default Portfolio3DGallery;

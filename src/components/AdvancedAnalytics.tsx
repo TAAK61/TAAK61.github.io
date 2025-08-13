@@ -35,11 +35,15 @@ class AdvancedAnalytics {
     // Track scroll behavior
     document.addEventListener('scroll', this.trackScrollBehavior.bind(this));
 
-    // Track voice commands usage
-    window.addEventListener('voiceCommandUsed', this.trackVoiceCommand.bind(this));
+    // Track voice commands usage (custom event)
+    window.addEventListener('voiceCommandUsed', ((ev: Event) => {
+      this.trackVoiceCommand(ev as CustomEvent);
+    }) as EventListener);
 
-    // Track 3D interactions
-    window.addEventListener('3dInteraction', this.track3DInteraction.bind(this));
+    // Track 3D interactions (custom event)
+    window.addEventListener('3dInteraction', ((ev: Event) => {
+      this.track3DInteraction(ev as CustomEvent);
+    }) as EventListener);
 
     // Track performance metrics
     this.trackPerformanceMetrics();
@@ -176,8 +180,8 @@ class AdvancedAnalytics {
             value: navEntry.loadEventEnd - navEntry.fetchStart,
             metadata: {
               domContentLoaded: navEntry.domContentLoadedEventEnd - navEntry.fetchStart,
-              firstPaint: performance.getEntriesByType('paint')[0]?.startTime || 0,
-              firstContentfulPaint: performance.getEntriesByType('paint')[1]?.startTime || 0
+              firstPaint: (performance.getEntriesByType('paint')[0] as any)?.startTime || 0,
+              firstContentfulPaint: (performance.getEntriesByType('paint')[1] as any)?.startTime || 0
             }
           });
         }
@@ -187,15 +191,16 @@ class AdvancedAnalytics {
     // Largest Contentful Paint
     new PerformanceObserver((list) => {
       const entries = list.getEntries();
-      const lastEntry = entries[entries.length - 1];
+      if (!entries.length) return;
+      const lastEntry: any = entries[entries.length - 1];
 
       this.trackEvent({
         action: 'largest_contentful_paint',
         category: 'performance',
         label: 'lcp',
-        value: lastEntry.startTime,
+        value: lastEntry?.startTime ?? 0,
         metadata: {
-          element: lastEntry.element?.tagName || 'unknown',
+          element: lastEntry?.element?.tagName || 'unknown',
           timestamp: Date.now()
         }
       });
@@ -204,7 +209,7 @@ class AdvancedAnalytics {
 
   private detectKeywords(content: string): string[] {
     const keywords = [
-      'projet', 'collaboration', 'blockchain', 'vr', 'ar', 'ia', 'intelligence artificielle',
+      'projet', 'collaboration', 'vr', 'ar', 'ia', 'intelligence artificielle',
       'portfolio', 'compétences', 'technologies', 'développement', 'innovation'
     ];
 
@@ -217,8 +222,8 @@ class AdvancedAnalytics {
     this.interactions.push(event);
 
     // Envoi vers Google Analytics 4 si disponible
-    if (typeof gtag !== 'undefined') {
-      gtag('event', event.action, {
+    if (typeof window !== 'undefined' && typeof window.gtag !== 'undefined') {
+      window.gtag('event', event.action, {
         event_category: event.category,
         event_label: event.label,
         value: event.value,
@@ -322,15 +327,7 @@ export function useAdvancedAnalytics() {
     const analytics = new AdvancedAnalytics();
 
     // Tracking automatique de la page
-    analytics.trackEvent({
-      action: 'page_view',
-      category: 'navigation',
-      label: pathname,
-      metadata: {
-        referrer: document.referrer,
-        timestamp: Date.now()
-      }
-    });
+    analytics.trackSectionView(`page_view:${pathname}`);
 
     // Nettoyage avant départ de la page
     const handleBeforeUnload = () => {

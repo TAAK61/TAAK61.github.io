@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     default: 'Kiame Touré - Portfolio Liquid Glass | Développeur Full-Stack & Expert Technologies Émergentes',
     template: '%s | Kiame Touré - Portfolio Liquid Glass'
   },
-  description: 'Portfolio professionnel révolutionnaire avec technologie Liquid Glass. Spécialisé en développement web/mobile, blockchain, VR/AR, IA et entrepreneuriat. Créateur de solutions innovantes.',
+  description: 'Portfolio professionnel révolutionnaire avec technologie Liquid Glass. Spécialisé en développement web/mobile, VR/AR, IA et entrepreneuriat. Créateur de solutions innovantes.',
   applicationName: 'Portfolio Liquid Glass',
   authors: [
     {
@@ -31,9 +31,6 @@ export const metadata: Metadata = {
     'Next.js',
     'Three.js',
     'TypeScript',
-    'Blockchain',
-    'Crypto',
-    'DeFi',
     'VR',
     'AR',
     'Intelligence Artificielle',
@@ -50,7 +47,11 @@ export const metadata: Metadata = {
     'Solutions business',
     'Innovation',
     'Portfolio interactif',
-    'Expérience immersive'
+    'Expérience immersive',
+    'Réalité virtuelle',
+    'Développement 3D',
+    'Unity',
+    'Blender'
   ],
   referrer: 'origin-when-cross-origin',
   themeColor: [
@@ -93,7 +94,7 @@ export const metadata: Metadata = {
     url: siteUrl,
     siteName: 'Portfolio Liquid Glass - Kiame Touré',
     title: 'Kiame Touré - Portfolio Liquid Glass | Expert Technologies Émergentes',
-    description: 'Portfolio professionnel révolutionnaire avec technologie Liquid Glass. Expert en développement web/mobile, blockchain, VR/AR, IA et entrepreneuriat.',
+    description: 'Portfolio professionnel révolutionnaire avec technologie Liquid Glass. Expert en développement web/mobile, VR/AR, IA et entrepreneuriat.',
     images: [
       {
         url: `${siteUrl}/og-image.jpg`,
@@ -116,7 +117,7 @@ export const metadata: Metadata = {
     site: '@kiame_toure', // Remplacez par votre handle Twitter
     creator: '@kiame_toure',
     title: 'Kiame Touré - Portfolio Liquid Glass | Expert Technologies Émergentes',
-    description: 'Portfolio révolutionnaire avec technologie Liquid Glass. Expert en blockchain, VR/AR, IA et développement web/mobile.',
+    description: 'Portfolio révolutionnaire avec technologie Liquid Glass. Expert en VR/AR, IA et développement web/mobile.',
     images: {
       url: `${siteUrl}/og-image.jpg`,
       alt: 'Portfolio Liquid Glass - Kiame Touré',

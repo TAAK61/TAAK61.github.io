@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// 4 domaines principaux selon le cahier des charges
+// 3 domaines principaux selon votre nouvelle orientation
 const expertiseData = [
 	{
 		id: 'development',
@@ -21,31 +21,20 @@ const expertiseData = [
 		title: 'Technologies Émergentes',
 		subtitle: 'VR/AR, IA, 3D',
 		icon: '🥽',
-		description: 'Réalité virtuelle, intelligence artificielle et impression 3D',
-		technologies: ['Three.js', 'WebXR', 'TensorFlow', 'OpenAI', 'Unity'],
-		projects: '15+ projets',
+		description: 'Réalité virtuelle, intelligence artificielle et expériences immersives',
+		technologies: ['Three.js', 'WebXR', 'TensorFlow', 'OpenAI', 'Unity', 'Blender'],
+		projects: '18+ projets',
 		gradient: 'from-purple-400/30 to-pink-400/30',
 		crystalColor: 'rgba(147, 51, 234, 0.3)',
-	},
-	{
-		id: 'finance',
-		title: 'Finance/Crypto',
-		subtitle: 'DeFi, Blockchain',
-		icon: '₿',
-		description: 'Finance décentralisée et technologies blockchain',
-		technologies: ['Solidity', 'Web3.js', 'Ethereum', 'DeFi', 'NFT'],
-		projects: '12+ projets',
-		gradient: 'from-yellow-400/30 to-orange-400/30',
-		crystalColor: 'rgba(245, 158, 11, 0.3)',
 	},
 	{
 		id: 'entrepreneurship',
 		title: 'Entrepreneuriat',
 		subtitle: 'Business, Innovation',
 		icon: '🚀',
-		description: 'Création de startups et innovation business',
-		technologies: ['Strategy', 'Business Model', 'Innovation', 'Leadership', 'Growth'],
-		projects: '8+ startups',
+		description: 'Création de startups et innovation business avec solutions tech',
+		technologies: ['Strategy', 'Business Model', 'Innovation', 'Leadership', 'Growth Hacking'],
+		projects: '12+ startups',
 		gradient: 'from-green-400/30 to-emerald-400/30',
 		crystalColor: 'rgba(34, 197, 94, 0.3)',
 	},
@@ -135,26 +124,25 @@ export default function ExpertiseSection() {
 				</svg>
 			</div>
 
-			{/* Particules cristallines flottantes */}
+			{/* Particules cristallines optimisées - Réduites de 20 à 6 */}
 			<div className="absolute inset-0 pointer-events-none">
-				{[...Array(20)].map((_, i) => (
+				{[...Array(6)].map((_, i) => (
 					<motion.div
 						key={i}
 						className="absolute w-1 h-1 bg-white/10 rounded-full"
 						style={{
-							left: `${Math.random() * 100}%`,
-							top: `${Math.random() * 100}%`,
+							left: `${20 + (i * 15)}%`,
+							top: `${30 + (i * 8)}%`,
 						}}
 						animate={{
-							y: [0, -150, 0],
-							opacity: [0, 0.8, 0],
-							scale: [0.5, 1.5, 0.5],
-							rotateZ: [0, 360, 720],
+							y: [0, -30, 0],
+							opacity: [0, 0.6, 0],
+							scale: [0.5, 1, 0.5],
 						}}
 						transition={{
-							duration: 6 + Math.random() * 4,
+							duration: 4 + Math.random() * 2,
 							repeat: Infinity,
-							delay: Math.random() * 3,
+							delay: Math.random() * 2,
 							ease: 'easeInOut',
 						}}
 					/>
@@ -195,7 +183,7 @@ export default function ExpertiseSection() {
 							Mon Expertise
 						</h2>
 						<p className="text-xl text-white/80 max-w-3xl mx-auto">
-							4 domaines d'excellence • Équilibre technique-business-innovation
+							3 domaines d'excellence • Équilibre technique-business-innovation
 						</p>
 					</motion.div>
 				</motion.div>
@@ -408,10 +396,10 @@ export default function ExpertiseSection() {
 
 					<div className="grid md:grid-cols-4 gap-6">
 						{[
-							{ domain: 'Web3 & DeFi', trend: 'Layer 2 Solutions', growth: '+156%' },
 							{ domain: 'IA Générative', trend: 'Multimodal AI', growth: '+234%' },
 							{ domain: 'Métaverse', trend: 'Spatial Computing', growth: '+89%' },
 							{ domain: 'Green Tech', trend: 'Carbon Credits', growth: '+127%' },
+							{ domain: 'Edge & Cloud', trend: 'Edge Inference', growth: '+142%' },
 						].map((item, index) => (
 							<motion.div
 								key={item.domain}

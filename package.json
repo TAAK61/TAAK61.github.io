@@ -14,9 +14,7 @@
     "next.js",
     "three.js",
     "typescript",
-    "webxr",
-    "crypto",
-    "blockchain"
+    "webxr"
   ],
   "scripts": {
     "dev": "next dev",

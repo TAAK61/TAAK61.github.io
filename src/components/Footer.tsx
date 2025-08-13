@@ -127,7 +127,7 @@ export default function Footer() {
             </h3>
             <p className="text-gray-300 text-sm leading-relaxed">
               Développeur Full-Stack passionné par l'innovation technologique.
-              Spécialisé dans les applications web modernes, la blockchain,
+              Spécialisé dans les applications web modernes,
               la réalité virtuelle et l'intelligence artificielle.
             </p>
             <div className="space-y-2 text-sm text-gray-400">
@@ -249,7 +249,7 @@ export default function Footer() {
           <div className="flex flex-wrap justify-center gap-3">
             {[
               'React', 'Next.js', 'TypeScript', 'Node.js', 'Python', 'Rust',
-              'Three.js', 'WebXR', 'Blockchain', 'Solidity', 'Web3', 'TensorFlow',
+              'Three.js', 'WebXR', 'TensorFlow',
               'AWS', 'Docker', 'PostgreSQL', 'MongoDB', 'GraphQL', 'Tailwind CSS'
             ].map((tech, index) => (
               <motion.span

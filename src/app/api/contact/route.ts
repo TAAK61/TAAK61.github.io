@@ -46,7 +46,7 @@ const ContactSchema = z.object({
     .optional(),
 
   projectType: z.enum([
-    'web', 'mobile', 'blockchain', 'vr-ar', 'ai', 'consulting', 'other'
+    'web', 'mobile', 'vr-ar', 'ai', 'consulting', 'other'
   ], { required_error: 'Type de projet requis' }),
 
   budget: z.enum([
@@ -69,7 +69,6 @@ const LABELS = {
   projectType: {
     web: 'Application Web',
     mobile: 'Application Mobile',
-    blockchain: 'Blockchain/Crypto',
     'vr-ar': 'VR/AR',
     ai: 'Intelligence Artificielle',
     consulting: 'Conseil Technique',

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Types pour le chatbot
@@ -49,21 +49,21 @@ export function IntelligentChatbot({ isHidden, onToggleVisibility }: Intelligent
   const knowledgeBase = {
     expertise: {
       keywords: ['compétences', 'expertise', 'technologies', 'stack', 'langages'],
-      response: "Je maîtrise plusieurs domaines :\n\n💻 **Développement** : React, Next.js, TypeScript, Node.js, Python, Rust\n\n🚀 **Technologies Émergentes** : Three.js, WebXR, IA, TensorFlow\n\n₿ **Blockchain** : Solidity, Web3.js, DeFi, NFT\n\n📈 **Entrepreneuriat** : Strategy, MVP, Growth, Leadership"
+      response: "Je maîtrise plusieurs domaines :\n\n💻 **Développement** : React, Next.js, TypeScript, Node.js, Python, Rust\n\n🚀 **Technologies Émergentes** : Three.js, WebXR, IA, TensorFlow\n\n📈 **Entrepreneuriat** : Strategy, MVP, Growth, Leadership"
     },
     projects: {
       keywords: ['projets', 'portfolio', 'réalisations', 'travaux'],
-      response: "Voici mes projets phares :\n\n🌐 **Portfolio Liquid Glass** - Site immersif avec Three.js\n₿ **Crypto Tracker** - App de suivi crypto temps réel\n🥽 **AR Experience** - Réalité augmentée éducative\n🤖 **AI Assistant** - IA avec NLP avancé\n💎 **DeFi Platform** - Finance décentralisée\n\nVoulez-vous en savoir plus sur un projet en particulier ?"
+      response: "Voici mes projets phares :\n\n🌐 **Portfolio Liquid Glass** - Site immersif avec effets avancés\n🥽 **AR Experience** - Réalité augmentée éducative\n🤖 **AI Assistant** - IA avec NLP avancé\n🧪 **Plateforme Collaborative** - SaaS temps réel\n\nVoulez-vous en savoir plus sur un projet en particulier ?"
     },
     contact: {
       keywords: ['contact', 'collaboration', 'embauche', 'projet', 'travailler'],
-      response: "Je suis disponible pour de nouveaux projets ! 🚀\n\n📧 **Email** : contact@kiametoure.me\n💼 **Collaboration** : Rendez-vous via Setmore\n🌐 **LinkedIn** : Connectons-nous\n\nJe peux vous aider avec :\n• Développement web/mobile\n• Solutions blockchain\n• Applications 3D/VR\n• Conseil tech"
+      response: "Je suis disponible pour de nouveaux projets ! 🚀\n\n📧 **Email** : contact@kiametoure.me\n💼 **Collaboration** : Rendez-vous via Setmore\n🌐 **LinkedIn** : Connectons-nous\n\nJe peux vous aider avec :\n• Développement web/mobile\n• Applications 3D/VR\n• Intégrations IA\n• Conseil tech"
     },
     experience: {
       keywords: ['expérience', 'parcours', 'formation', 'background'],
-      response: "Mon parcours technique :\n\n🎓 **Formation** : Autodidacte passionné + formations continues\n💼 **Expérience** : 5+ ans en développement innovant\n🏆 **Spécialités** :\n• Applications full-stack modernes\n• Intégration blockchain et crypto\n• Expériences immersives 3D/VR\n• Solutions d'intelligence artificielle"
+      response: "Mon parcours technique :\n\n🎓 **Formation** : Autodidacte passionné + formations continues\n💼 **Expérience** : 5+ ans en développement innovant\n🏆 **Spécialités** :\n• Applications full-stack modernes\n• Expériences immersives 3D/VR\n• Solutions d'intelligence artificielle"
     }
-  };
+  } as const;
 
   // Messages de démarrage
   const welcomeMessages: Message[] = [
@@ -137,12 +137,13 @@ export function IntelligentChatbot({ isHidden, onToggleVisibility }: Intelligent
 
   const getSuggestions = (category: string): string[] => {
     const suggestions = {
-      expertise: ['Quelles technologies utilises-tu ?', 'Peux-tu développer en blockchain ?'],
-      projects: ['Montre-moi le portfolio 3D', 'Parle-moi du crypto tracker'],
+      expertise: ['Quelles technologies utilises-tu ?', "Quels frameworks front/back maîtrises-tu ?"],
+      projects: ['Montre-moi le portfolio 3D', 'Parle-moi de l’AR Experience'],
       contact: ['Comment puis-je te contacter ?', 'Quel est ton tarif ?'],
       experience: ['Quel est ton parcours ?', 'Depuis quand codes-tu ?']
-    };
-    return suggestions[category as keyof typeof suggestions] || [];
+    } as const;
+    const list = suggestions[category as keyof typeof suggestions] || [];
+    return Array.isArray(list) ? [...list] : [];
   };
 
   // Intelligence artificielle simulée
@@ -215,10 +216,6 @@ export function IntelligentChatbot({ isHidden, onToggleVisibility }: Intelligent
     }, 1000 + Math.random() * 1000);
   };
 
-  const handleSuggestionClick = (suggestion: string) => {
-    sendMessage(suggestion);
-  };
-
   const toggleChat = () => {
     setIsOpen(!isOpen);
     if (!isOpen) {
@@ -238,7 +235,7 @@ export function IntelligentChatbot({ isHidden, onToggleVisibility }: Intelligent
     };
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       sendMessage(inputValue);
@@ -421,7 +418,7 @@ export function IntelligentChatbot({ isHidden, onToggleVisibility }: Intelligent
                     type="text"
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
-                    onKeyPress={handleKeyPress}
+                    onKeyDown={handleKeyDown}
                     placeholder="Votre message..."
                     className="flex-1 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-purple-400"
                   />

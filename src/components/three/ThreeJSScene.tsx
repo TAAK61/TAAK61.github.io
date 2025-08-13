@@ -88,18 +88,6 @@ function Enhanced3DFloatingObjects() {
         </div>
       </div>
 
-      {/* Pyramide Blockchain */}
-      <div
-        className="absolute top-40 right-32 w-20 h-20 animate-float-3d hidden lg:block"
-        style={{ animationDelay: '1.5s', animationDuration: '8s' }}
-      >
-        <div className="relative w-full h-full">
-          <div className="absolute inset-0 bg-gradient-to-t from-yellow-400/30 to-orange-500/30 backdrop-blur-sm border border-white/20 transform rotate-45 rounded-lg">
-            <div className="flex items-center justify-center h-full text-2xl transform -rotate-45">₿</div>
-          </div>
-        </div>
-      </div>
-
       {/* Sphère WebXR */}
       <div
         className="absolute bottom-40 left-32 w-18 h-18 animate-float-3d hidden lg:block"
